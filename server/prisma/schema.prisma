@@ -1,0 +1,70 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URI")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  memberships  Membership[]
+  files        File[]
+}
+
+model Workspace {
+  id        String        @id @default(uuid())
+  name      String
+  type      WorkspaceType
+  files     File[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  memberships Membership[]
+}
+
+model Membership {
+  id          String   @id @default(uuid())
+  userId      String
+  workspaceId String
+  role        Role
+  createdAt   DateTime @default(now())
+
+  user        User      @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([userId, workspaceId]) // a user can only join a workspace once
+}
+
+model File {
+    id          String      @id @default(uuid())
+    filename    String
+    type        String
+    path        String
+    workspaceId String
+    workspace   Workspace  @relation(fields: [workspaceId], references: [id])
+    uploadedBy  String
+    uploader    User       @relation(fields: [uploadedBy], references: [id])
+    createdAt   DateTime   @default(now())
+}
+
+enum WorkspaceType {
+  PERSONAL
+  ORGANIZATION
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
