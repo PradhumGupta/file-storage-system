@@ -17,8 +17,9 @@ model User {
   updatedAt    DateTime @updatedAt
 
   // Relations
-  memberships  Membership[]
-  files        File[]
+  memberships Membership[]
+  files       File[]
+  Folder      Folder[]
 }
 
 model Workspace {
@@ -30,6 +31,7 @@ model Workspace {
   updatedAt DateTime      @updatedAt
 
   memberships Membership[]
+  Folder      Folder[]
 }
 
 model Membership {
@@ -39,22 +41,41 @@ model Membership {
   role        Role
   createdAt   DateTime @default(now())
 
-  user        User      @relation(fields: [userId], references: [id])
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
 
   @@unique([userId, workspaceId]) // a user can only join a workspace once
 }
 
+model Folder {
+  id          String   @id @default(cuid())
+  name        String
+  parentId    String?
+  workspaceId String
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  parent     Folder?   @relation("SubFolders", fields: [parentId], references: [id])
+  subFolders Folder[]  @relation("SubFolders")
+  files      File[]
+  workspace  Workspace @relation(fields: [workspaceId], references: [id])
+  owner      User      @relation(fields: [ownerId], references: [id])
+}
+
 model File {
-    id          String      @id @default(uuid())
-    filename    String
-    type        String
-    path        String
-    workspaceId String
-    workspace   Workspace  @relation(fields: [workspaceId], references: [id])
-    uploadedBy  String
-    uploader    User       @relation(fields: [uploadedBy], references: [id])
-    createdAt   DateTime   @default(now())
+  id          String    @id @default(uuid())
+  filename    String
+  type        String
+  path        String
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  uploadedBy  String
+  uploader    User      @relation(fields: [uploadedBy], references: [id])
+  createdAt   DateTime  @default(now())
+  Folder      Folder?   @relation(fields: [folderId], references: [id])
+  folderId    String?
 }
 
 enum WorkspaceType {

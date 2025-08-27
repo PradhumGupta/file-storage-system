@@ -1,4 +1,3 @@
-
 import prisma from "../config/prisma"
 
 export class WorkspaceServices {
