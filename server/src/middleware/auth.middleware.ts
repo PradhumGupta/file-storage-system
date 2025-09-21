@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { verifyAccessToken } from "../config/jwt";
 
 const { ACCESS_TOKEN_SECRET } = process.env;
 
@@ -16,12 +17,17 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         }
 
         const token = authHeader.split(" ")[1];
-        const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET as string) as { id: string };
+        const decoded: any = verifyAccessToken(token);
+
+        if(!decoded.id) {
+            throw new Error("Invalid token");
+        }
         
         req.user = decoded;
+        console.log("user verified. from auth auth middleware");
         next();
 
-    } catch (error) {
-        // will be defined.
+    } catch (error: any) {
+        res.status(401).json({ error: error.message })
     }
 }

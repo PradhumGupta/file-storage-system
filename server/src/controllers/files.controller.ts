@@ -1,10 +1,14 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { FileServices } from "../services/files.service";
-import z from "zod";
+import z, { file } from "zod";
 
 const workspaceIdCheck = z.object({
     workspaceId: z.string().min(8, "WorkspaceId is required")
+})
+
+const folderIdCheck = z.object({
+    folderId: z.string().min(8, "folderId is required")
 })
 
 const fileServices = new FileServices();
@@ -12,10 +16,12 @@ const fileServices = new FileServices();
 export class FileController {
     public static fileUpload = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
-            const {workspaceId, folderId} = req.params;
+            const { workspaceId, folderId } = req.params;
             const userId = req.user?.id;
 
             workspaceIdCheck.parse({workspaceId});
+            
+            if(folderId) folderIdCheck.parse({folderId});
 
             if(!req.file) {
                 return res.status(400).json({ message: "No file uploaded" });
@@ -23,7 +29,7 @@ export class FileController {
 
             const file = await fileServices.addFile(req.file as Express.Multer.File, workspaceId, folderId, userId as string);
 
-            res.json({ message: "File uploaded", file })
+            res.status(201).json({ message: "File uploaded", file })
         } catch (error: any) {
             console.error("Error in file upload", error);
             res.json({ message: "file upload failed", error: error.message ?? "Server Error" });
@@ -32,12 +38,13 @@ export class FileController {
 
     public static ListFiles = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
-            const {workspaceId} = req.params;
+            const {workspaceId, folderId} = req.params;
             const userId = req.user?.id;
 
             workspaceIdCheck.parse({workspaceId});
+            folderIdCheck.parse({folderId});
 
-            const files = await fileServices.getFiles(workspaceId);
+            const files = await fileServices.getFiles(workspaceId, folderId);
 
             res.json(files);
         } catch (error: any) {
@@ -49,12 +56,12 @@ export class FileController {
     public static fileDownload = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const { workspaceId, fileId } = req.params;
-            const userId = req.user?.id;
+            const userId = req.user!.id;
 
-            workspaceIdCheck.parse({workspaceId});
+            const parsed = workspaceIdCheck.parse({workspaceId});
 
-            const file = await fileServices.searchFileToDownload(fileId);
-            res.download(file.filePath, file.filename)
+            const file = await fileServices.searchFileToDownload(workspaceId, fileId);
+            res.download(file.path, file.filename)
             res.json({ message: "File downloaded", file })
         } catch (error: any) {
             console.error("Error in file download", error);
@@ -67,11 +74,24 @@ export class FileController {
             const { workspaceId } = req.params;
             const { name, parentId } = req.body;
 
+            workspaceIdCheck.parse({workspaceId});
+
             const newFolder = await fileServices.createNewFolder(name, parentId, req.user?.id as string, workspaceId);
 
             res.json(newFolder);
         } catch (error: any) {
             console.error("Error in creating folder", error);
+            res.json({ message: "failed to create folder", error: error.message ?? "Server Error" });
+        }
+    }
+
+    public static showFolder = async (req: AuthRequest, res: Response) => {
+        try {
+            const { folderId, workspaceId } = req.params;
+            const folderDetails = await fileServices.listFolder(folderId, workspaceId);
+            res.json({ message: "Fetched folder successfully", folder: folderDetails });
+        } catch (error: any) {
+            console.error("Error in show folder controller", error);
             res.json({ message: "failed to create folder", error: error.message ?? "Server Error" });
         }
     }

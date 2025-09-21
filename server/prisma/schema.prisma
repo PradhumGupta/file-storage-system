@@ -19,7 +19,7 @@ model User {
   // Relations
   memberships Membership[]
   files       File[]
-  Folder      Folder[]
+  folder      Folder[]
 }
 
 model Workspace {
@@ -65,7 +65,7 @@ model Folder {
 }
 
 model File {
-  id          String    @id @default(uuid())
+  id          String    @id @default(cuid())
   filename    String
   type        String
   path        String

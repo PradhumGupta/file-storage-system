@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import prisma from "../config/prisma";
 import bcrypt from "bcryptjs";
 import { WorkspaceServices } from "./workspace.service";
+import { generateAccessToken, generateRefreshToken } from "../config/jwt";
 
 const {ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET} = process.env;
 
@@ -28,13 +29,13 @@ export class AuthService {
         const isValid = await bcrypt.compare(password, user.password);
         if(!isValid) throw new Error("Invalid credentials");
 
-        const accessToken = jwt.sign({id: user.id}, ACCESS_TOKEN_SECRET as string, { expiresIn: '1h' });
-        const refreshToken = jwt.sign({id: user.id}, REFRESH_TOKEN_SECRET as string, { expiresIn: '7d' });
+        const accessToken = generateAccessToken(user.id)
+        const refreshToken = generateRefreshToken(user.id);
 
         await prisma.user.update({
             where: { id: user.id },
             data: { refreshToken }
-        });
+        });  // user object not updated before returning but correctly updated on db
 
         return { accessToken, refreshToken, user };
     }
@@ -43,6 +44,21 @@ export class AuthService {
         const user = await prisma.user.findUnique({ where: {id: userId} });
         if(!user || user.refreshToken !== token) throw new Error("Invalid RT");
 
+        const newAccessToken = generateAccessToken(user.id);
+
+        return newAccessToken;
+    }
+
+    public logoutSession = async (userId: string) => {
+        await prisma.user.update({
+            where: { id: userId },
+            data: { refreshToken: null }
+        })
+    }
+
+    public getProfile = async (userId: string) => {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
         
+        return user;
     }
 }
