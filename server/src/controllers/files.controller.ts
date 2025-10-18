@@ -16,8 +16,10 @@ const fileServices = new FileServices();
 export class FileController {
     public static fileUpload = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
-            const { workspaceId, folderId } = req.params;
+            const { workspaceId } = req.params;
             const userId = req.user?.id;
+
+            const {folderId} = req.body;
 
             workspaceIdCheck.parse({workspaceId});
             
@@ -56,11 +58,12 @@ export class FileController {
     public static fileDownload = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const { workspaceId, fileId } = req.params;
+            const { folderId } = req.query;
             const userId = req.user!.id;
 
             const parsed = workspaceIdCheck.parse({workspaceId});
 
-            const file = await fileServices.searchFileToDownload(workspaceId, fileId);
+            const file = await fileServices.searchFileToDownload(workspaceId, folderId as string|undefined, fileId);
             res.download(file.path, file.filename)
             res.json({ message: "File downloaded", file })
         } catch (error: any) {
@@ -78,10 +81,22 @@ export class FileController {
 
             const newFolder = await fileServices.createNewFolder(name, parentId, req.user?.id as string, workspaceId);
 
-            res.json(newFolder);
+            res.json({ folder: newFolder});
         } catch (error: any) {
             console.error("Error in creating folder", error);
             res.json({ message: "failed to create folder", error: error.message ?? "Server Error" });
+        }
+    }
+
+    public static deleteFolder = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const { workspaceId, folderId } = req.params;
+            await fileServices.deleteFolder(folderId, workspaceId);
+
+            res.json({ message: "Folder deleted successfully" });
+        } catch (error) {
+            console.error("Error in deleting folder", error);
+            next(error);
         }
     }
 
@@ -92,7 +107,18 @@ export class FileController {
             res.json({ message: "Fetched folder successfully", folder: folderDetails });
         } catch (error: any) {
             console.error("Error in show folder controller", error);
-            res.json({ message: "failed to create folder", error: error.message ?? "Server Error" });
+            res.json({ message: "failed to show folder", error: error.message ?? "Server Error" });
+        }
+    }
+
+    public static getPath = async (req: AuthRequest, res: Response) => {
+        try {
+            const { folderId, workspaceId } = req.params;
+            const folderPath = await fileServices.getFolderPath(folderId, workspaceId);
+            res.json({ message: "Fetched folder path successfully", path: folderPath });
+        } catch (error: any) {
+            console.error("Error in getPath controller", error);
+            res.json({ message: "failed to getting path of folder", error: error.message ?? "Server Error" });
         }
     }
 }

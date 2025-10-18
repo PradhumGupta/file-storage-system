@@ -48,17 +48,21 @@ export class WorkspaceServices {
         return workspace;
     }
 
-    public fetchWorkspaceFiles = async (workspaceId: string) => {
-        const folders = await prisma.folder.findMany({
-            where: { workspaceId, parentId: null },
-        });
+    public fetchWorkspace = async (workspaceId: string) => {
 
-        const files = await prisma.file.findMany({
-            where: { workspaceId, folderId: null },
-            include: { uploader: true }
-        });
+        const workspace = await prisma.workspace.findUnique({
+            where: {id: workspaceId},
+            include: {
+                folders: {
+                    where: { parentId: null }
+                },
+                files: {
+                    where: { folderId: null }
+                }
+            }
+        })
 
-        return { folders, files };
+        return workspace;
     }
 
     public inviteMember = async (workspaceId: string, actorUserId: string, userId: string, role: Role) => {

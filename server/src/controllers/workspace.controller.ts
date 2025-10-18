@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { WorkspaceServices } from "../services/workspace.service";
 import { Role } from "@prisma/client";
-import { access } from "fs";
 
 const workspaceServices = new WorkspaceServices();
 
@@ -29,12 +28,12 @@ export class WorkspaceController {
         }
     }
 
-    public static listFoldersFiles = async (req: AuthRequest, res: Response) => {
+    public static fetchWorkspace = async (req: AuthRequest, res: Response) => {
         try {
             const { workspaceId } = req.params;
-            const {folders, files} = await workspaceServices.fetchWorkspaceFiles(workspaceId);
+            const workspace = await workspaceServices.fetchWorkspace(workspaceId);
 
-            res.status(200).json({ message: "Fetched files and folders in the workspace successfully", folders, files });
+            res.status(200).json({ message: "Fetched files and folders in the workspace successfully", workspace });
         } catch (error: any) {
             console.error("Error in listFoldersFiles controller", error);
             res.status(500).json({ message: error.message ?? "Server Error" });

@@ -9,9 +9,10 @@ const router = Router({ mergeParams: true });
 
 router.post("/files/upload", authenticate, requireWorkspaceMember, requireWorkspaceRole([Role.ADMIN, Role.MEMBER, Role.OWNER]), upload.single("file"), FileController.fileUpload);
 router.get("/files/:fileId/download", authenticate, requireWorkspaceMember, FileController.fileDownload);
-router.get("/folders/:folderId/files", authenticate, requireWorkspaceMember, FileController.ListFiles);
+// router.get("/folders/:folderId/files", authenticate, requireWorkspaceMember, FileController.ListFiles); use showFolder instead
 router.post("/folders", authenticate, requireWorkspaceMember, requireWorkspaceRole([Role.OWNER, Role.ADMIN]), FileController.createFolder);
-router.get("/folders/:id", authenticate, requireWorkspaceMember, FileController.showFolder);
+router.get("/folders/:folderId", authenticate, requireWorkspaceMember, FileController.showFolder);
+router.get("/folders/:folderId/path", authenticate, requireWorkspaceMember, FileController.getPath);
 
 export default router;
 

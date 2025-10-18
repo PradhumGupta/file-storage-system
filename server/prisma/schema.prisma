@@ -8,7 +8,7 @@ generator client {
 }
 
 model User {
-  id           String   @id @default(uuid())
+  id           String   @id @default(cuid())
   name         String
   email        String   @unique
   password     String
@@ -19,11 +19,12 @@ model User {
   // Relations
   memberships Membership[]
   files       File[]
-  folder      Folder[]
+  folders      Folder[]
+  team       TeamMember[]
 }
 
 model Workspace {
-  id        String        @id @default(uuid())
+  id        String        @id @default(cuid())
   name      String
   type      WorkspaceType
   files     File[]
@@ -31,11 +32,12 @@ model Workspace {
   updatedAt DateTime      @updatedAt
 
   memberships Membership[]
-  Folder      Folder[]
+  folders      Folder[]
+  teams        Team[]
 }
 
 model Membership {
-  id          String   @id @default(uuid())
+  id          String   @id @default(cuid())
   userId      String
   workspaceId String
   role        Role
@@ -47,6 +49,28 @@ model Membership {
   @@unique([userId, workspaceId]) // a user can only join a workspace once
 }
 
+model Team {
+  id          String       @id @default(cuid())
+  name        String
+  workspaceId String
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id])
+
+  members     TeamMember[]
+  folders     Folder[]
+}
+
+model TeamMember {
+  id      String @id @default(cuid())
+  userId  String
+  teamId  String
+
+  user    User   @relation(fields: [userId], references: [id])
+  team    Team   @relation(fields: [teamId], references: [id])
+
+  @@unique([userId, teamId])
+}
+
+
 model Folder {
   id          String   @id @default(cuid())
   name        String
@@ -55,6 +79,9 @@ model Folder {
   ownerId     String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  teamId      String?   // Only one team for now
+  team        Team?     @relation(fields: [teamId], references: [id])
 
   // Relations
   parent     Folder?   @relation("SubFolders", fields: [parentId], references: [id])
@@ -74,7 +101,7 @@ model File {
   uploadedBy  String
   uploader    User      @relation(fields: [uploadedBy], references: [id])
   createdAt   DateTime  @default(now())
-  Folder      Folder?   @relation(fields: [folderId], references: [id])
+  folder      Folder?   @relation(fields: [folderId], references: [id])
   folderId    String?
 }
 

@@ -12,7 +12,7 @@ router.get("/", WorkspaceController.getUserWorkspaces);
 
 router.post("/", WorkspaceController.createOrg);
 
-router.get("/:workspaceId/list", requireWorkspaceMember, WorkspaceController.listFoldersFiles);
+router.get("/:workspaceId/list", requireWorkspaceMember, WorkspaceController.fetchWorkspace);
 
 router.post("/:workspaceId/invite", requireWorkspaceMember, requireWorkspaceRole([Role.OWNER, Role.ADMIN]), WorkspaceController.invite);
 
