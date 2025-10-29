@@ -1,0 +1,26 @@
+import api from "../lib/axios"
+
+class FileServices {
+    public static showFolder = async (workspaceId: string, folderId: string) => {
+        const response = await api.get(`/workspaces/${workspaceId}/folders/${folderId}`);
+        return response.data.folder;
+    }
+    public static getPath = async (workspaceId: string, folderId: string) => { 
+        const response = await api.get(`/workspaces/${workspaceId}/folders/${folderId}/path`);
+        return response.data.path
+    }
+    public static downloadFile = async (workspaceId: string, fileId: string) => {
+        const response = await api.get(`/workspaces/${workspaceId}/files/${fileId}/download`);
+        return response.data;
+    }
+    public static createFolder = async (workspaceId: string, name: string, parentId: string|undefined) => {
+        const response = await api.post(`/workspaces/${workspaceId}/folders`, { name, parentId });
+        return response.data.folder;
+    }
+    public static deleteFolder = async (workspaceId: string, folderId: string) => {
+        const response = await api.delete(`/workspaces/${workspaceId}/folders/${folderId}`);
+        return response.data.message;
+    }
+};
+
+export default FileServices;
