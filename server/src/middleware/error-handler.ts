@@ -12,5 +12,6 @@ export function errorHandler(
   } // If there is no error, call next.
 
   const status = err.statusCode || 500;
+  console.error(err)
   res.status(status).json({ status: status, message: err.message });
 }

@@ -1,17 +1,26 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.middleware";
 import { FileController } from "../controllers/files.controller";
-import { upload } from "../middleware/multer.middleware";
+// import { upload } from "../middleware/multer.middleware";
 import { requireWorkspaceMember, requireWorkspaceRole } from "../middleware/workspaceAuth.middleware";
-import { Role } from "@prisma/client";
+import { WorkspaceRole } from "@prisma/client";
+import { checkAccess } from "../middleware/check-access.middleware";
+import multer from "multer";
 
 const router = Router({ mergeParams: true });
 
-router.post("/files/upload", authenticate, requireWorkspaceMember, requireWorkspaceRole([Role.ADMIN, Role.MEMBER, Role.OWNER]), upload.single("file"), FileController.fileUpload);
+const upload = multer({ storage: multer.memoryStorage() });
+
+router.post("/files/upload", authenticate, requireWorkspaceMember, upload.single("file"), FileController.fileUpload);
+
 router.get("/files/:fileId/download", authenticate, requireWorkspaceMember, FileController.fileDownload);
+
 // router.get("/folders/:folderId/files", authenticate, requireWorkspaceMember, FileController.ListFiles); use showFolder instead
-router.post("/folders", authenticate, requireWorkspaceMember, requireWorkspaceRole([Role.OWNER, Role.ADMIN]), FileController.createFolder);
+
+router.post("/folders", authenticate, requireWorkspaceMember, requireWorkspaceRole([WorkspaceRole.OWNER, WorkspaceRole.ADMIN]), FileController.createFolder);
+
 router.get("/folders/:folderId", authenticate, requireWorkspaceMember, FileController.showFolder);
+
 router.get("/folders/:folderId/path", authenticate, requireWorkspaceMember, FileController.getPath);
 
 export default router;

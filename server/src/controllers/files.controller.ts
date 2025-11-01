@@ -26,12 +26,13 @@ export class FileController {
             if(folderId) folderIdCheck.parse({folderId});
 
             if(!req.file) {
+                console.log("No file upoloaded")
                 return res.status(400).json({ message: "No file uploaded" });
             }
 
             const file = await fileServices.addFile(req.file as Express.Multer.File, workspaceId, folderId, userId as string);
 
-            res.status(201).json({ message: "File uploaded", file })
+            res.status(201).json({ status: "success", message: "File uploaded", file })
         } catch (error: any) {
             console.error("Error in file upload", error);
             res.json({ message: "file upload failed", error: error.message ?? "Server Error" });
@@ -64,8 +65,9 @@ export class FileController {
             const parsed = workspaceIdCheck.parse({workspaceId});
 
             const file = await fileServices.searchFileToDownload(workspaceId, folderId as string|undefined, fileId);
-            res.download(file.path, file.filename)
-            res.json({ message: "File downloaded", file })
+            // res.download(file.path, file.filename)
+            // res.download(file.downloadUrl)
+            res.json({ message: "File downloaded", downloadUrl: file.downloadUrl })
         } catch (error: any) {
             console.error("Error in file download", error);
             res.json({ message: "file download failed", error: error.message ?? "Server Error" });

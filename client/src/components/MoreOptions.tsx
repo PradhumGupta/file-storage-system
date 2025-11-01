@@ -43,8 +43,13 @@ export default function MoreOptions({ type, item }: props) {
     toast.error(`Deleting`);
   };
 
-  const handleFileDownload = () => {
-    toast.success(`Downloading file`);
+  const handleFileDownload = async () => {
+    const res = await FileServices.downloadFile(activeWorkspace?.id, item.id)
+    if (res.downloadUrl) {
+    window.open(res.downloadUrl, "_blank");
+  } else {
+    alert("Failed to generate download link");
+  }
   };
 
   return (
@@ -72,12 +77,12 @@ export default function MoreOptions({ type, item }: props) {
         </DropdownMenuItem>
 
         {/* Download action - only for files */}
-        {type === "file" && (
+        
           <DropdownMenuItem onClick={() => handleFileDownload()}>
             <Download className="w-4 h-4 mr-2" />
             Download
           </DropdownMenuItem>
-        )}
+        
 
         <DropdownMenuSeparator />
 

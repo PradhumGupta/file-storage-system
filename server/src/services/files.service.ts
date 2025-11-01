@@ -1,23 +1,37 @@
 import path from "path";
 import prisma from "../config/prisma";
 import fs from "fs";
-import { fileQueue } from "../queues/file.queue";
+// import { fileQueue } from "../queues/file.queue";
 import { NotFoundError } from "../utils/errors";
+import { supabase } from "../config/supabase";
 
 const dirname = path.resolve(process.cwd());
 
 export class FileServices {
   public addFile = async (
-    fileData: Express.Multer.File,
+    file: Express.Multer.File,
     workspaceId: string,
     folderId: string | undefined,
     userId: string
   ) => {
-    const file = await prisma.file.create({
+    const filePath = `workspace_${workspaceId}/${
+      folderId || 'root'
+    }/${Date.now()}_${file.originalname}`;
+
+    const { data, error } = await supabase.storage
+      .from(process.env.SUPABASE_BUCKET!)
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false,
+      });
+
+    if(error) throw error;
+
+    const newFile = await prisma.file.create({
       data: {
-        filename: fileData.originalname,
-        type: fileData.mimetype,
-        path: fileData.path || "",
+        filename: file.originalname,
+        type: file.mimetype,
+        path: filePath,
         workspaceId,
         folderId: folderId || null,
         uploadedBy: userId,
@@ -25,9 +39,9 @@ export class FileServices {
     });
 
     // enqueue background job
-    await fileQueue.add("processFile", { fileId: file.id, path: file.path }, { attempts: 2 });
+    // await fileQueue.add("processFile", { fileId: file.id, path: file.path }, { attempts: 2 });
 
-    return file;
+    return newFile;
   };
 
   public getFiles = async (workspaceId: string, folderId: string) => {
@@ -52,6 +66,12 @@ export class FileServices {
       throw new Error("File not found");
     }
 
+    const { data, error } = await supabase.storage.from(process.env.SUPABASE_BUCKET!).createSignedUrl(file.path, 100);
+
+    /*
+
+    // incase of multer local storage
+
     const filePath = path.join(dirname, file.path);
 
     console.log(filePath)
@@ -62,7 +82,10 @@ export class FileServices {
       throw new Error("File missing in storage");
     }
 
-    return { filePath, ...file };
+    return { filePath, ...file };  */
+
+    return { downloadUrl: data?.signedUrl };  
+
   };
 
   public createNewFolder = async (

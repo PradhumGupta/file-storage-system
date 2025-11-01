@@ -9,6 +9,14 @@ class FileServices {
         const response = await api.get(`/workspaces/${workspaceId}/folders/${folderId}/path`);
         return response.data.path
     }
+    public static upload = async (workspaceId: string, folderId: string, file: File) => {
+        const formData = new FormData();
+        formData.append("folderId", folderId);
+        formData.append("file", file)
+        
+        const response = await api.post(`/workspaces/${workspaceId}/files/upload`, formData);
+        return response.data.status;
+    }
     public static downloadFile = async (workspaceId: string, fileId: string) => {
         const response = await api.get(`/workspaces/${workspaceId}/files/${fileId}/download`);
         return response.data;

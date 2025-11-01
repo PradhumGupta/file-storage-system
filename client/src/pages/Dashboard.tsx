@@ -7,6 +7,7 @@ import {
   FolderIcon,
   FilePlus,
   Share,
+  UploadCloudIcon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,6 +31,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CreateFolderForm from "@/components/CreateFolderForm";
 import MoreOptions from "@/components/MoreOptions";
 import { SpinnerColor } from "@/components/Spinner";
+import { UploadModal } from "@/components/UploadModal";
+import { UploadStatusCard } from "@/components/UploadStatusCard";
+
+export interface Upload {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  progress: number;
+  intervalId: any;
+}
 
 const Dashboard = () => {
   const [folders, setFolders] = useState<Folder[]>([]);
@@ -47,7 +59,8 @@ const Dashboard = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [path, setPath] = useState<{ id: string; name: string }[]>([]);
   const [openForm, setOpenForm] = useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [uploads, setUploads] = useState<Upload[]>([]);
   
 
   useEffect(() => {
@@ -96,6 +109,62 @@ const Dashboard = () => {
     showData();
   }, [activeWorkspace, folderId]);
 
+  // // Simulate file upload process
+  // const startUpload = (file) => {
+  //   // 1. Add file to uploads list as 'pending'
+  //   const newUpload = {
+  //     id: Date.now() + Math.random() + "",
+  //     name: file.name,
+  //     type: file.type,
+  //     progress: 0,
+  //     status: 'pending',
+  //   };
+  //   setUploads(prev => [...prev, newUpload]);
+
+  //   // 2. Start simulated upload after a short delay
+  //   setTimeout(() => {
+  //     setUploads(prev => prev.map(u => u.id === newUpload.id ? { ...u, status: 'uploading' } : u));
+  //     let progress = 0;
+  //     const interval = setInterval(() => {
+  //       progress += 10;
+  //       setFiles(prev => prev.map(u => u.id === newUpload.id ? { ...u, progress: Math.min(progress, 100) } : u));
+        
+  //       if (progress >= 100) {
+  //         clearInterval(interval);
+  //         // Simulate success or failure
+  //         const finalStatus = Math.random() > 0.1 ? 'complete' : 'failed'; // 10% fail rate
+  //         setFiles(prev => prev.map(u => u.id === newUpload.id ? { ...u, status: finalStatus, progress: 100 } : u));
+  //       }
+  //     }, 300);
+      
+  //     // Store the interval ID for cancellation
+  //     newUpload.intervalId = interval;
+  //     setFiles(prev => prev.map(u => u.id === newUpload.id ? { ...u, intervalId: interval } : u));
+  //   }, 500);
+  // };
+
+  // const handleFileUpload = (fileList) => {
+  //   Array.from(fileList).forEach(file => {
+  //     startUpload(file);
+  //   });
+  // };
+  
+  // const handleCancelUpload = (id) => {
+  //     setUploads(prev => {
+  //         const uploadToCancel = prev.find(u => u.id === id);
+  //         if (uploadToCancel && uploadToCancel.intervalId) {
+  //             clearInterval(uploadToCancel.intervalId);
+  //         }
+  //         return prev.filter(u => u.id !== id);
+  //     });
+  // };
+
+  // const handleClearAll = () => {
+  //     // Clear all completed/failed uploads, but keep active ones if any
+  //     const activeUploads = uploads.filter(u => u.status === 'uploading' || u.status === 'pending');
+  //     setUploads(activeUploads);
+  // };
+
 
   return (
     <div className="flex bg-gray-100 h-screen p-4 font-sans">
@@ -103,7 +172,7 @@ const Dashboard = () => {
       {loading ? (
         <SpinnerColor />
       ) : (
-        <div className="flex flex-1 bg-white rounded-[40px] shadow-lg overflow-hidden">
+        <div className="relative flex flex-1 bg-white rounded-[40px] shadow-lg overflow-hidden">
           {/* Sidebar */}
           <Sidebar activeTab="All files" />
 
@@ -306,7 +375,10 @@ const Dashboard = () => {
                         Folder
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setSortBy("Name")}>
-                        File
+                        <div className="flex justify-center gap-2" onClick={() => setIsModalOpen(true)}>
+                          <UploadCloudIcon size={20} />
+                          <span>Upload</span>
+                        </div>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -422,6 +494,21 @@ const Dashboard = () => {
             </div> 
           )}
           </main>
+          {/* Renders the Upload Modal */}
+      <UploadModal 
+        uploads={uploads}
+        setUploads={setUploads}
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)}
+      />
+      
+      {/* Renders the Upload Status Card */}
+      <UploadStatusCard 
+        uploads={uploads} 
+        setUploads={setUploads}
+        setFiles={setFiles}
+      />
+      
         </div>
       )}
     </div>
