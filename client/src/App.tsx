@@ -7,6 +7,7 @@ import { useAuth } from "./hooks/useAuth"
 import { Toaster } from "react-hot-toast"
 import TeamsPage from "./pages/TeamsPage"
 import MembersPage from "./pages/MembersPage"
+import FileViewer from "./pages/FileViewer"
 
 // ✅ Protect routes — only authenticated users can access
 const PrivateRoute = () => {
@@ -36,6 +37,7 @@ function App() {
                 <Route path=":workspaceName/folder/:folderId" element={<Dashboard />} />
                 <Route path=":workspaceName/members" element={<MembersPage />} />
                 <Route path=":workspaceName/teams" element={<TeamsPage />} />
+                <Route path="file/:fileId" element={<FileViewer />} />
               </Route>
             </Route>
 

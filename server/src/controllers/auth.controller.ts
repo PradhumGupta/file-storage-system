@@ -23,7 +23,6 @@ const loginSchema = z.object({
 });
 
 const authService = new AuthService();
-
 export class AuthController {
   public static SignUp = async (
     req: Request,
@@ -37,6 +36,7 @@ export class AuthController {
       const user = await authService.register(name, email, password);
       res.json({ message: "User registered", user });
     } catch (error: any) {
+      console.log("Error occured in signup controller", error.message)
       throw error
     }
   };
@@ -53,23 +53,23 @@ export class AuthController {
         password
       );
       setCookies(res, accessToken, refreshToken);
-      console.log("accessToke", accessToken)
       res.json({ message: "User logged in", accessToken, refreshToken, user });
     } catch (error: any) {
+      console.log("Error occured in login controller", error.message)
       throw error    
     }
   };
 
   public static refresh = async (req: Request, res: Response) => {
-    const token = req.cookies.access_token || req.body.token;
+    const token = req.cookies.refresh_token || req.body.token;
 
     try {
       const decoded: any = verifyRefreshToken(token as string);
       const accessToken = await authService.refresh(decoded.id, token as string);
-
-      res.json({ message: "Token refreshed", accessToken });
+      setCookies(res, accessToken, token);
+      res.status(201).json({ message: "Token refreshed", accessToken });
     } catch (error: any) {
-      console.error("Error in refresh auth controller", error);
+      console.log("Error in refresh auth controller", error.message);
       throw error    
     }
   };
@@ -81,7 +81,7 @@ export class AuthController {
       res.clearCookie("refresh_token");
       res.json({ message: "Logged out successfully" });
     } catch (error: any) {
-      console.error("Error in logout auth controller", error);
+      console.log("Error in logout auth controller", error.message);
       throw error    
     }
   };
@@ -91,7 +91,7 @@ export class AuthController {
       const found = await authService.checkUser(req.body?.email);
       res.status(200).json({ found });
     } catch (err: any) {
-      console.error("Error in checking user status", err);
+      console.log("Error in checking user status", err.message);
       throw err
     }
   };
@@ -101,8 +101,9 @@ export class AuthController {
       const userProfile = await authService.getProfile(req.user!.id);
       res.json({ message: "User Profile retrieved", user: userProfile });
     } catch (error: any) {
-      console.error("Error in profile auth controller", error);
+      console.log("Error in profile auth controller", error.message);
       throw error    
     }
   };
+
 }

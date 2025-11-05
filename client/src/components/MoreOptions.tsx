@@ -22,6 +22,7 @@ interface props {
   type: "folder" | "file";
   item: {
     id: string;
+    filename?: string;
   };
 }
 
@@ -43,12 +44,39 @@ export default function MoreOptions({ type, item }: props) {
     toast.error(`Deleting`);
   };
 
-  const handleFileDownload = async () => {
+  const handleFileOpen = async () => {
     const res = await FileServices.downloadFile(activeWorkspace?.id, item.id)
     if (res.downloadUrl) {
     window.open(res.downloadUrl, "_blank");
   } else {
     alert("Failed to generate download link");
+  }
+  };
+
+  const handleFileDownload = async () => {
+    const file = await FileServices.downloadFile(activeWorkspace?.id, item.id)
+    if (file) {
+
+    const url = window.URL.createObjectURL(new Blob([file]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', item.filename);
+    document.body.appendChild(link);
+    link.click();
+
+    console.log(link)
+
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+
+    // // Create a temporary link and click it
+    // const link = document.createElement('a');
+    
+    // // Append the download query parameter to force download
+    // link.href = `${res.downloadUrl}&download`;
+    // link.click();
+  } else {
+    alert("Failed to download");
   }
   };
 
@@ -67,9 +95,9 @@ export default function MoreOptions({ type, item }: props) {
           <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="start" className="w-48">
         <DropdownMenuItem>
-            <Link to={`/${item}/${item.id}`} className="flex gap-2 items-center">
+            <Link to={`/dashboard/${type}/${item.id}`} className="flex gap-2 items-center">
             <SquareArrowOutUpRightIcon className="w-4 h-4 mr-2" />
             <span>Open</span>
           </Link>
@@ -77,11 +105,12 @@ export default function MoreOptions({ type, item }: props) {
         </DropdownMenuItem>
 
         {/* Download action - only for files */}
-        
+        {type === "file" && 
           <DropdownMenuItem onClick={() => handleFileDownload()}>
             <Download className="w-4 h-4 mr-2" />
             Download
           </DropdownMenuItem>
+        }
         
 
         <DropdownMenuSeparator />

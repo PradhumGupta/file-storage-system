@@ -12,6 +12,7 @@ import { Button } from "./ui/button";
 import type { Folder } from "@/contexts/WorkspaceContext";
 import TeamServices from "@/services/team.api";
 import toast from "react-hot-toast";
+import { useWorkspace } from "@/hooks/useWorkspace";
 
 interface Team {
   id: string
@@ -34,25 +35,25 @@ interface Member {
 }
 
 interface props {
-    workspaceId: string
     isCreateModalOpen: boolean 
     setIsCreateModalOpen: React.Dispatch<React.SetStateAction<boolean>>
     setTeams: React.Dispatch<React.SetStateAction<Team[]>>
 }
 
-function CreateTeamModal({workspaceId, isCreateModalOpen, setIsCreateModalOpen, setTeams}: props) {
+function CreateTeamModal({isCreateModalOpen, setIsCreateModalOpen, setTeams}: props) {
     
     const [newTeamName, setNewTeamName] = useState('');
     const [newTeamDescription, setNewTeamDescription] = useState('');
+    const { activeWorkspace } = useWorkspace()
     
   const handleCreateTeam = async () => {
     if (newTeamName.trim()) {
       try {
-        const newTeam = await TeamServices.createTeam(workspaceId, newTeamName, newTeamDescription);
+        const newTeam = await TeamServices.createTeam(activeWorkspace!.id, newTeamName, newTeamDescription);
         toast.success(`Team ${newTeamName} created`);
         setTeams((prev) => [...prev, newTeam])
       } catch (error) {
-        toast.error("error occured")
+        toast.error(error?.message)
         console.log(error)
       }
       setIsCreateModalOpen(false);
@@ -85,7 +86,7 @@ function CreateTeamModal({workspaceId, isCreateModalOpen, setIsCreateModalOpen, 
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Description (Optional)</label>
+                <label className="text-sm font-medium">Description </label>
                 <Input
                   value={newTeamDescription}
                   onChange={(e) => setNewTeamDescription(e.target.value)}

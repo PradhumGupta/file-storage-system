@@ -64,7 +64,6 @@ function MembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('VIEWER');
   const [loading, setLoading] = useState(false);
 
   const { activeWorkspace } = useWorkspace();
@@ -242,7 +241,7 @@ function MembersPage() {
       </div>
 
       {/* Invite Member Modal */}
-      <InviteModal type='Workspace' isInviteModalOpen={isInviteModalOpen} setIsInviteModalOpen={setIsInviteModalOpen} modalName={"Workspace"} />
+      <InviteModal type='Workspace' isInviteModalOpen={isInviteModalOpen} setIsInviteModalOpen={setIsInviteModalOpen} />
       {/* <Dialog open={isInviteModalOpen} onOpenChange={setIsInviteModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

@@ -11,8 +11,8 @@ class TeamServices {
         return response.data.teams;
     }
 
-    public static createMember = async (workspaceId: string) => {
-        const response = await api.post(`/workspaces/${workspaceId}/team/add`, { name });
+    public static createMember = async (workspaceId: string, teamId: string, userId: string, role: string) => {
+        const response = await api.post(`/workspaces/${workspaceId}/team/${teamId}/add`, { userId, role });
         return response.data.team;
     }
 
@@ -21,9 +21,9 @@ class TeamServices {
         return response.data.members;
     }
 
-    public static assignFolder = async (workspaceId: string, teamId: string, folderId: string) => {
-        const response = await api.put(`/workspaces/${workspaceId}/team/${teamId}/folder`, { folderId });
-        return response.data.folder;
+    public static assignFolder = async (workspaceId: string, teamId: string, folderIds: string[]) => {
+        const response = await api.put(`/workspaces/${workspaceId}/team/${teamId}/folder`, { folderIds });
+        return response.data;
     }
 
     public static createFolder = async (workspaceId: string, teamId: string, name: string) => {

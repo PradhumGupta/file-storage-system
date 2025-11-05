@@ -2,7 +2,8 @@ import { Router } from "express";
 import { WorkspaceController } from "../controllers/workspace.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { requireWorkspaceMember, requireWorkspaceRole } from "../middleware/workspaceAuth.middleware";
-import { Role } from "@prisma/client";
+import { WorkspaceRole } from "@prisma/client";
+import { checkAccess } from "../middleware/check-access.middleware";
 
 const router = Router();
 
@@ -14,8 +15,12 @@ router.post("/", WorkspaceController.createOrg);
 
 router.get("/:workspaceId/list", requireWorkspaceMember, WorkspaceController.fetchWorkspace);
 
-router.post("/:workspaceId/invite", requireWorkspaceMember, requireWorkspaceRole([Role.OWNER, Role.ADMIN]), WorkspaceController.invite);
+router.get("/:workspaceId/members", requireWorkspaceMember, WorkspaceController.members);
 
-router.delete("/:workspaceId/remove", requireWorkspaceMember, requireWorkspaceRole([Role.OWNER, Role.ADMIN]), WorkspaceController.remove);
+router.post("/:workspaceId/members", requireWorkspaceMember, checkAccess("workspace", "manage"), WorkspaceController.invite);
+
+router.delete("/:workspaceId/members", requireWorkspaceMember, checkAccess("workspace", "manage"), WorkspaceController.remove);
+
+router.get("/:workspaceId/other-users", requireWorkspaceMember, checkAccess("workspace", "manage"), WorkspaceController.getUsers);
 
 export default router;

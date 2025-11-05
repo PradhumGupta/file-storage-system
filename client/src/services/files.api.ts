@@ -18,7 +18,7 @@ class FileServices {
         return response.data.status;
     }
     public static downloadFile = async (workspaceId: string, fileId: string) => {
-        const response = await api.get(`/workspaces/${workspaceId}/files/${fileId}/download`);
+        const response = await api.get(`/workspaces/${workspaceId}/files/${fileId}/download`, { responseType: 'blob' });
         return response.data;
     }
     public static createFolder = async (workspaceId: string, name: string, parentId: string|undefined) => {
@@ -28,6 +28,10 @@ class FileServices {
     public static deleteFolder = async (workspaceId: string, folderId: string) => {
         const response = await api.delete(`/workspaces/${workspaceId}/folders/${folderId}`);
         return response.data.message;
+    }
+    public static getPublicFolders = async (workspaceId: string) => {
+        const response = await api.get(`/workspaces/${workspaceId}/folders`);
+        return response.data.folders;
     }
 };
 

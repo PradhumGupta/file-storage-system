@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "./auth.middleware";
 import prisma from "../config/prisma";
-import { Role } from "@prisma/client";
+import { WorkspaceRole } from "@prisma/client";
 
 
 export const requireWorkspaceMember = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -25,8 +25,8 @@ export const requireWorkspaceMember = async (req: AuthRequest, res: Response, ne
 };
 
 
-export const requireWorkspaceRole = (allowed: Role[]) => (req: AuthRequest, res: Response, next: NextFunction) => {
-    const membership = (req as any).membership as { role: Role } | undefined;
+export const requireWorkspaceRole = (allowed: WorkspaceRole[]) => (req: AuthRequest, res: Response, next: NextFunction) => {
+    const membership = (req as any).membership as { role: WorkspaceRole } | undefined;
 
     if(!membership) return res.status(500).json({ error: "Membership context missing" });
 

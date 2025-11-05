@@ -66,7 +66,25 @@ export class FileServices {
       throw new Error("File not found");
     }
 
-    const { data, error } = await supabase.storage.from(process.env.SUPABASE_BUCKET!).createSignedUrl(file.path, 100);
+    const { data, error } = await supabase.storage.from(process.env.SUPABASE_BUCKET!).download(file.path);
+
+    if (error) {
+      console.error('Error downloading file:', error);
+      throw error
+    }
+
+    const buffer = Buffer.from(await data.arrayBuffer());
+
+    // 3. Set the appropriate headers
+    // For a real application, you'd get the correct mime-type.
+    // Here, we guess based on extension for simplicity.
+    const fileExtension = file.path.split('.').pop();
+    const contentType = `application/${fileExtension}`; // Example: 'application/pdf' or 'image/jpeg'
+    const fileName = file.path.split('/').pop();
+
+    console.log("filename" ,fileName)
+
+    return { buffer, contentType, fileName }
 
     /*
 
@@ -83,8 +101,6 @@ export class FileServices {
     }
 
     return { filePath, ...file };  */
-
-    return { downloadUrl: data?.signedUrl };  
 
   };
 
@@ -152,18 +168,21 @@ export class FileServices {
     return path
   }
 
-  public assignFolderToTeam = async (folderId: string, teamId: string, workspaceId: string) => {
-    const folder = await prisma.folder.update({
+  public assignFolderToTeam = async (folderIds: string[], teamId: string, workspaceId: string) => {
+    await prisma.folder.updateMany({
       where: {
-        id: folderId,
-        workspaceId
+        workspaceId,
+        id: {
+          in: folderIds
+        }
       },
       data: {
-        teamId
+        teamId,
+        access: "PRIVATE"
       }
     })
 
-    return folder;
+    return;
   }
 
   public createTeamFolder = async (folderName: string, teamId: string, userId: string, workspaceId: string) => {
@@ -186,5 +205,16 @@ export class FileServices {
             }
         })
         return folders;
+    }
+
+    public getPublicFolders = async (workspaceId: string) => {
+      const folders = await prisma.folder.findMany({
+        where: {
+          workspaceId: workspaceId,
+          access: "PUBLIC"
+        },
+      })
+
+      return folders;
     }
 }

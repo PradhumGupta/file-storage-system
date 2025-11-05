@@ -19,6 +19,8 @@ router.get("/files/:fileId/download", authenticate, requireWorkspaceMember, File
 
 router.post("/folders", authenticate, requireWorkspaceMember, requireWorkspaceRole([WorkspaceRole.OWNER, WorkspaceRole.ADMIN]), FileController.createFolder);
 
+router.get("/folders", authenticate, requireWorkspaceMember, requireWorkspaceRole([WorkspaceRole.OWNER, WorkspaceRole.ADMIN]), FileController.getFolders);
+
 router.get("/folders/:folderId", authenticate, requireWorkspaceMember, FileController.showFolder);
 
 router.get("/folders/:folderId/path", authenticate, requireWorkspaceMember, FileController.getPath);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react';
 import { Button } from './ui/button';
 import {
   Dialog,
@@ -9,16 +9,16 @@ import {
 } from '@/components/ui/dialog';
 import { Crown, Mail, Search, Shield, User, UserCheck } from 'lucide-react';
 import { Input } from './ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import toast from 'react-hot-toast';
 import WorkspaceServices from '@/services/workspace.api';
 import { SpinnerColor } from './Spinner';
 import debounce from "lodash.debounce"
+import TeamServices from '@/services/team.api';
 
 interface Team {
-  id: number
+  id: string
   name: string
   description: string
   memberCount: number
@@ -42,7 +42,7 @@ interface props {
     type: "Team" | "Workspace"
     isInviteModalOpen: boolean
     setIsInviteModalOpen: React.Dispatch<React.SetStateAction<boolean>>
-    modalName: string
+    selectedTeam?: Team
 }
 
 
@@ -79,7 +79,7 @@ interface User {
 }
 
 
-function InviteModal({ type, isInviteModalOpen, setIsInviteModalOpen, modalName}: props) {
+function InviteModal({ type, isInviteModalOpen, setIsInviteModalOpen, selectedTeam}: props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
@@ -99,9 +99,9 @@ const handleSearch = async (query: string) => {
   try {
     let users;
     if(type === "Workspace")
-      users = await WorkspaceServices.getInviteUsers(activeWorkspace?.id, query);
+      users = await WorkspaceServices.getInviteUsers(activeWorkspace!.id, query);
     else 
-      users = await WorkspaceServices.getMembers(activeWorkspace?.id, query);
+      users = await WorkspaceServices.getMembers(activeWorkspace!.id, query);
     setSearchResults(users);
   } catch (error: any) {
     toast.error(error.response?.data?.message || "An error occurred")
@@ -120,30 +120,22 @@ const handleSearch = async (query: string) => {
   };
 
   const handleInviteUsers = async () => {
-    if (modalName === "Workspace") {
+    setLoading(true)
+    if (type === "Workspace") {
       const newMemberIds = selectedUsers.map(user => user.id);
 
       await WorkspaceServices.inviteMembers(activeWorkspace!.id, newMemberIds, inviteRole)
 
     } else {
-      const usersToInvite = searchResults.filter(user => selectedUsers.includes(user.id));
-      const newMembers = usersToInvite.map(user => ({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-        role: inviteRole,
-        joinedAt: new Date().toISOString().split('T')[0],
-        lastActive: 'Just joined',
-        status: 'active'
-      }));
+      const usersToInvite = selectedUsers.map(user => user.id);
+      await TeamServices.createMember(activeWorkspace!.id, selectedTeam!.id, usersToInvite[0], inviteRole)
     } 
 
       setIsInviteModalOpen(false);
       setSelectedUsers([]);
       setSearchQuery('');
       setInviteRole('Viewer');
-    
+      setLoading(false)
   };
   return (
     <Dialog open={isInviteModalOpen} onOpenChange={setIsInviteModalOpen}>
@@ -151,7 +143,7 @@ const handleSearch = async (query: string) => {
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
               <Mail className="w-5 h-5" />
-              <span>Add Members to {modalName}</span>
+              <span>Add Members to {selectedTeam?.name || type}</span>
             </DialogTitle>
             <DialogDescription>
               Search and add new members to collaborate in this {type?.toLowerCase()}
@@ -225,7 +217,7 @@ const handleSearch = async (query: string) => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ADMIN">
+                    <SelectItem value={type==="Workspace"? "ADMIN": "TEAM_ADMIN"}>
                       <div className="flex items-center space-x-2">
                         <Crown className="w-4 h-4 text-yellow-600" />
                         <div>
@@ -234,7 +226,7 @@ const handleSearch = async (query: string) => {
                         </div>
                       </div>
                     </SelectItem>
-                    <SelectItem value="MEMBER">
+                    <SelectItem value={type==="Workspace"? "MEMBER": "TEAM_MEMBER"}>
                       <div className="flex items-center space-x-2">
                         <Shield className="w-4 h-4 text-blue-600" />
                         <div>
@@ -243,7 +235,7 @@ const handleSearch = async (query: string) => {
                         </div>
                       </div>
                     </SelectItem>
-                    <SelectItem value="VIEWER">
+                    <SelectItem value={type==="Workspace"? "VIEWER": "--select--"}>
                       <div className="flex items-center space-x-2">
                         <User className="w-4 h-4 text-gray-600" />
                         <div>

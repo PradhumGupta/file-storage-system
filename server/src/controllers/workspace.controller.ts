@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { WorkspaceServices } from "../services/workspace.service";
-import { Role } from "@prisma/client";
+import { WorkspaceRole } from "@prisma/client";
+import { AuthService } from "../services/auth.service";
 
 const workspaceServices = new WorkspaceServices();
-
+const authService = new AuthService();
 export class WorkspaceController {
     public static getUserWorkspaces = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
@@ -45,11 +46,11 @@ export class WorkspaceController {
             const userId = req.user!.id;
             const { workspaceId } = req.params;
 
-            const { newMemberId, role } = req.body;
+            const { newMemberIds, role } = req.body;
 
-            const membership = await workspaceServices.inviteMember(workspaceId, userId, newMemberId as string, role as Role);
+            const memberships = await workspaceServices.inviteMember(workspaceId, userId, newMemberIds as string[], role as WorkspaceRole);
 
-            res.status(201).json({ message: "membership of the given user added with role", membership })
+            res.status(201).json({ message: "membership of the given user added with role", membership: memberships })
         } catch (error: any) {
             console.error("Error in invite controller", error);
             res.status(500).json({ message: error.message ?? "Server Error" });
@@ -60,7 +61,7 @@ export class WorkspaceController {
         try {
             const { workspaceId } = req.params;
             const { memberUserId } = req.body;
-            const userRole = (req as any).membership.role as Role;
+            const userRole = (req as any).membership.role as WorkspaceRole;
 
             await workspaceServices.removeMember(workspaceId, userRole, memberUserId)
 
@@ -71,4 +72,37 @@ export class WorkspaceController {
             res.status(500).json({ message: error.message ?? "Server Error" });
         }
     }
+
+    public static members = async (req: AuthRequest, res: Response) => {
+        try {
+            const { workspaceId } = req.params;
+            const { query } = req.query;
+            const members = await workspaceServices.getMembers(workspaceId);
+
+            res.json({ members });
+
+        } catch (error: any) {
+            console.error("Error in remove member controller", error);
+            res.status(500).json({ message: error.message ?? "Server Error" });
+        }
+    }
+
+    
+  public static getUsers = async (req: AuthRequest, res: Response) => {
+    try {
+      const { workspaceId } = req.params;
+      const { query } = req.query;
+      
+      const allUsers = await authService.getAllUsers();
+      const workspaceUsers = await workspaceServices.getMembers(workspaceId);
+
+      const otherUsers = allUsers.filter(user => !
+        workspaceUsers.some(workspaceUser => workspaceUser.id === user.id))
+
+      res.json({ message: "User Profile retrieved", users: otherUsers });
+    } catch (error: any) {
+      console.error("Error in profile auth controller", error);
+      throw error    
+    }
+  }
 }

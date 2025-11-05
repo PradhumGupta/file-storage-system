@@ -64,10 +64,25 @@ export class FileController {
 
             const parsed = workspaceIdCheck.parse({workspaceId});
 
-            const file = await fileServices.searchFileToDownload(workspaceId, folderId as string|undefined, fileId);
-            // res.download(file.path, file.filename)
-            // res.download(file.downloadUrl)
-            res.json({ message: "File downloaded", downloadUrl: file.downloadUrl })
+            const { buffer, contentType, fileName } =
+              await fileServices.searchFileToDownload(
+                workspaceId,
+                folderId as string | undefined,
+                fileId
+              );
+
+            // const originalFileName = (function getOriginalFilename(fileName) {
+            //   const parts = fileName?.split("_");
+            //   const originalNameParts = parts?.slice(1);
+            //   return originalNameParts?.join("_");
+            // })(fileName);
+
+            // console.log(originalFileName, contentType)
+
+            res.setHeader('Content-Type', contentType);
+            res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+
+            res.send(buffer)
         } catch (error: any) {
             console.error("Error in file download", error);
             res.json({ message: "file download failed", error: error.message ?? "Server Error" });
@@ -121,6 +136,17 @@ export class FileController {
         } catch (error: any) {
             console.error("Error in getPath controller", error);
             res.json({ message: "failed to getting path of folder", error: error.message ?? "Server Error" });
+        }
+    }
+
+    public static getFolders = async (req: AuthRequest, res: Response) => {
+        try {
+            const { workspaceId } = req.params;
+            const folders = await fileServices.getPublicFolders(workspaceId);
+            res.json({ message: "Fetched folder path successfully", folders });
+        } catch (error: any) {
+            console.log("Error in getPath controller", error.message);
+            throw error;
         }
     }
 }

@@ -411,7 +411,7 @@ const Dashboard = () => {
                     >
                       <div className="relative">
                         <div className="w-full h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-3">
-                          <FolderIcon className="h-12 w-12 text-blue-600" />
+                          <FolderIcon className="h-12 w-12 text-blue-400" />
                           
                           <div className="absolute right-3 top-3">
                             <MoreOptions type="folder" item={folder} />
@@ -439,7 +439,7 @@ const Dashboard = () => {
                           <div className="text-2xl">
                             📄
                             <div className="absolute right-3 top-3">
-                            <MoreOptions type="folder" item={file} />
+                            <MoreOptions type="file" item={file} />
                           </div>
                           </div>
                         </div>

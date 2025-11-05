@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import prisma from "../config/prisma";
 import bcrypt from "bcryptjs";
 import { WorkspaceServices } from "./workspace.service";
-import { emailQueue } from "../queues/email.queue";
+// import { emailQueue } from "../queues/email.queue";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 
 const {ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET} = process.env;
@@ -21,7 +21,7 @@ export class AuthService {
         const personal = await WorkspaceServices.createPersonalWorkspace(name, user.id)
 
         // enqueue background job
-        await emailQueue.add("sendWelcomeEmail", { userId: user.id, email });
+        // await emailQueue.add("sendWelcomeEmail", { userId: user.id, email });
 
         return user;
     }
@@ -70,5 +70,11 @@ export class AuthService {
         const user = await prisma.user.findUnique({ where: { id: userId } });
         
         return user;
+    }
+
+    public getAllUsers = async () => {
+        const users = await prisma.user.findMany();
+
+        return users;
     }
 }

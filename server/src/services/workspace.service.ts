@@ -1,4 +1,4 @@
-import { Role, WorkspaceType } from "@prisma/client";
+import { WorkspaceRole, WorkspaceType } from "@prisma/client";
 import prisma from "../config/prisma"
 
 export class WorkspaceServices {
@@ -40,7 +40,7 @@ export class WorkspaceServices {
                 memberships: {
                     create: {
                         userId: ownerUserId,
-                        role: Role.OWNER
+                        role: WorkspaceRole.OWNER
                     }
                 }
             }
@@ -65,43 +65,65 @@ export class WorkspaceServices {
         return workspace;
     }
 
-    public inviteMember = async (workspaceId: string, actorUserId: string, userId: string, role: Role) => {
+    public inviteMember = async (workspaceId: string, actorUserId: string, userIds: string[], role: WorkspaceRole) => {
         const actor = await prisma.membership.findFirst({
             where: { userId: actorUserId, workspaceId }
         });
 
-        // if(!)
-
         // prevent duplicate
-        const existing = await prisma.membership.findFirst({
-            where: { userId, workspaceId }
+        const existingMemberships = await prisma.membership.findMany({
+          where: {
+            workspaceId,
+            userId: { in: userIds },
+          },
+        });
+        const existingUserIds = existingMemberships.map(
+          (membership) => membership.userId
+        );
+        const newUserIds = userIds.filter(
+          (userId) => !existingUserIds.includes(userId)
+        );
+
+        // Create new membership records for the invited users
+        const newMemberships = newUserIds.map((userId) => ({
+          workspaceId,
+          userId,
+          role,
+        }));
+        const memberships = await prisma.membership.createMany({
+          data: newMemberships,
         });
 
-        if(existing) throw new Error("User is already a member");
-
-        const membership = await prisma.membership.create({
-            data: {
-                userId, workspaceId, role
-            }
-        });
-
-        return membership;
+        return memberships;
     }
 
-    public removeMember = async (workspaceId: string, actorRole: Role, userId: string) => {
+    public removeMember = async (workspaceId: string, actorRole: WorkspaceRole, userId: string) => {
         const target = await prisma.membership.findFirst({ where: { userId, workspaceId } });
         if(!target) throw new Error("target membership not found");
 
-        if(target.role === Role.OWNER) {
+        if(target.role === WorkspaceRole.OWNER) {
             const owners = await prisma.membership.count({
-                where: { workspaceId, role: Role.OWNER },
+                where: { workspaceId, role: WorkspaceRole.OWNER },
             });
 
             if(owners <= 1) throw new Error("Cannot remove only OWNER");
 
-            if(actorRole !== Role.OWNER) throw new Error("Cannot remove the owner unless one is owner");
+            if(actorRole !== WorkspaceRole.OWNER) throw new Error("Cannot remove the owner unless one is owner");
         }
 
         await prisma.membership.delete({ where: { id: target.id } });
+    }
+
+    public getMembers = async (workspaceId: string) => {
+        const members = await prisma.membership.findMany({
+            where: {
+                workspaceId
+            },
+            include: {
+                user: true
+            }
+        });
+
+        return members.map(({ user, createdAt, role }) => ({ ...user, joinedAt: createdAt, role }));
     }
 }

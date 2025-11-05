@@ -1,10 +1,12 @@
+import { TeamRole } from "@prisma/client";
 import prisma from "../config/prisma"
 
 class TeamServices {
-    public create = async (teamName: string, workspaceId: string) => {
+    public create = async (teamName: string, description: string, workspaceId: string) => {
         const newTeam = await prisma.team.create({
             data: {
                 name: teamName,
+                desc: description,
                 workspaceId,
             }
         });
@@ -12,11 +14,34 @@ class TeamServices {
         return newTeam
     }
 
-    public addMember = async (userId: string, teamId: string) => {
+    public getAllTeams = async (workspaceId: string) => {
+        const teams = await prisma.team.findMany({
+            where: {
+                workspaceId,
+            },
+            include: {
+                _count: {
+                    select: { members: true },
+                },
+            },
+        });
+
+        const teamWithMemberCount = teams.map(team => ({
+            id: team.id,
+            name: team.name,
+            description: team.desc,
+            memberCount: team._count.members
+        }));
+
+        return teamWithMemberCount;
+    }
+
+    public addMember = async (userId: string, teamId: string, role: TeamRole) => {
         const newMember = await prisma.teamMember.create({
             data: {
                 userId,
-                teamId
+                teamId,
+                role
             }
         });
 
@@ -29,11 +54,21 @@ class TeamServices {
                 teamId: teamId
             },
             include: {
-                user: true
+                user: {
+                    select: {
+                        name: true,
+                        email: true,
+                    }
+                }
             }
         })
 
-        return members.map(m => m.user);
+        return members.map(m => ({ 
+            id: m.userId,
+            name: m.user.name,
+            email: m.user.email,
+            role: m.role
+        }));
     }
 
 };

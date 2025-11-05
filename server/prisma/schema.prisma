@@ -1,108 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DB_URI")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
+  id           String       @id @default(cuid())
+  email        String       @unique
   password     String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
   refreshToken String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relations
-  memberships Membership[]
-  files       File[]
+  name         String
+  files        File[]
   folders      Folder[]
-  team       TeamMember[]
+  memberships  Membership[]
+  team         TeamMember[]
 }
 
 model Workspace {
-  id        String        @id @default(cuid())
-  name      String
-  type      WorkspaceType
-  files     File[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-
+  id          String        @id @default(cuid())
+  name        String
+  type        WorkspaceType
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  files       File[]
+  folders     Folder[]
   memberships Membership[]
-  folders      Folder[]
-  teams        Team[]
+  teams       Team[]
 }
 
 model Membership {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   userId      String
   workspaceId String
-  role        Role
-  createdAt   DateTime @default(now())
+  createdAt   DateTime      @default(now())
+  role        WorkspaceRole @default(MEMBER)
+  user        User          @relation(fields: [userId], references: [id])
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id])
 
-  user      User      @relation(fields: [userId], references: [id])
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
-
-  @@unique([userId, workspaceId]) // a user can only join a workspace once
+  @@unique([userId, workspaceId])
 }
 
 model Team {
   id          String       @id @default(cuid())
   name        String
+  desc        String
   workspaceId String
-  workspace   Workspace    @relation(fields: [workspaceId], references: [id])
-
-  members     TeamMember[]
   folders     Folder[]
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id])
+  members     TeamMember[]
 }
 
 model TeamMember {
-  id      String @id @default(cuid())
-  userId  String
-  teamId  String
-
-  user    User   @relation(fields: [userId], references: [id])
-  team    Team   @relation(fields: [teamId], references: [id])
+  id     String   @id @default(cuid())
+  userId String
+  teamId String
+  role   TeamRole
+  team   Team     @relation(fields: [teamId], references: [id])
+  user   User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, teamId])
 }
 
-
 model Folder {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
   parentId    String?
   workspaceId String
   ownerId     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  teamId      String?   // Only one team for now
-  team        Team?     @relation(fields: [teamId], references: [id])
-
-  // Relations
-  parent     Folder?   @relation("SubFolders", fields: [parentId], references: [id])
-  subFolders Folder[]  @relation("SubFolders")
-  files      File[]
-  workspace  Workspace @relation(fields: [workspaceId], references: [id])
-  owner      User      @relation(fields: [ownerId], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  teamId      String?
+  access      FolderVisibility @default(PUBLIC)
+  files       File[]
+  owner       User             @relation(fields: [ownerId], references: [id])
+  parent      Folder?          @relation("SubFolders", fields: [parentId], references: [id])
+  subFolders  Folder[]         @relation("SubFolders")
+  team        Team?            @relation(fields: [teamId], references: [id])
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id])
 }
 
 model File {
   id          String    @id @default(cuid())
-  filename    String
-  type        String
+  filename        String    // changed from filename to name
   path        String
   workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
   uploadedBy  String
-  uploader    User      @relation(fields: [uploadedBy], references: [id])
   createdAt   DateTime  @default(now())
-  folder      Folder?   @relation(fields: [folderId], references: [id])
+  type        String
   folderId    String?
+  folder      Folder?   @relation(fields: [folderId], references: [id])
+  uploader    User      @relation(fields: [uploadedBy], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
 }
 
 enum WorkspaceType {
@@ -110,9 +103,20 @@ enum WorkspaceType {
   ORGANIZATION
 }
 
-enum Role {
+enum WorkspaceRole {
   OWNER
   ADMIN
   MEMBER
   VIEWER
+}
+
+enum TeamRole {
+  TEAM_ADMIN
+  TEAM_MEMBER
+  TEAM_VIEWER
+}
+
+enum FolderVisibility {
+  PRIVATE
+  PUBLIC
 }
