@@ -44,6 +44,7 @@ export interface WorkspaceContextType {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   role: string;
   setRole: React.Dispatch<React.SetStateAction<string>>
+  memberships: Membership[]
 }
 
 export const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);

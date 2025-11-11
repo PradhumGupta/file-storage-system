@@ -8,6 +8,7 @@ import { Toaster } from "react-hot-toast"
 import TeamsPage from "./pages/TeamsPage"
 import MembersPage from "./pages/MembersPage"
 import FileViewer from "./pages/FileViewer"
+import WorkspaceProvider from "./contexts/WorkspaceProvider"
 
 // ✅ Protect routes — only authenticated users can access
 const PrivateRoute = () => {
@@ -19,9 +20,16 @@ const PrivateRoute = () => {
   return <Outlet />;
 };
 
+function WorkspaceLayout() {
+  return (
+    <WorkspaceProvider>
+      <Outlet />
+    </WorkspaceProvider>
+  )
+}
+
 function App() {
   
-
   return (
     <div className="min-h-screen">
       <Routes>
@@ -30,13 +38,12 @@ function App() {
         <Route path="login" element={<SigninPage />} />
 
         {/* Protected Routes */}
-            <Route element={<PrivateRoute />}>
-              <Route path="dashboard"> 
+            <Route path="dashboard" element={<PrivateRoute />}>
+              <Route path=":workspaceName" element={<WorkspaceLayout />}>
                 <Route index element={<Dashboard />} />
-                <Route path=":workspaceName" element={<Dashboard />} />
-                <Route path=":workspaceName/folder/:folderId" element={<Dashboard />} />
-                <Route path=":workspaceName/members" element={<MembersPage />} />
-                <Route path=":workspaceName/teams" element={<TeamsPage />} />
+                <Route path="folder/:folderId" element={<Dashboard />} />
+                <Route path="members" element={<MembersPage />} />
+                <Route path="teams" element={<TeamsPage />} />
                 <Route path="file/:fileId" element={<FileViewer />} />
               </Route>
             </Route>
