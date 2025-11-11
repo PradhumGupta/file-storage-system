@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="900" viewBox="0 0 600 450" role="img" aria-label="Zenith logo">
+  <!-- Filled thick chevron -->
+  <path d="M100 350 L300 150 L500 350 L430 350 L300 220 L170 350 Z"
+        fill="#000000"/>
+
+  <!-- Circle above chevron -->
+  <circle cx="300" cy="80" r="35" fill="#000000"/>
+</svg>

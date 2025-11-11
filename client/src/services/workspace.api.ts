@@ -24,6 +24,16 @@ class WorkspaceServices {
         const response = await api.post(`/workspaces/${workspaceId}/members`, { newMemberIds, role });
         return response.data;
     }
+
+    public static changeRole = async (workspaceId: string, memberUserId: string, newRole: string) => {
+        const response = await api.patch(`/workspaces/${workspaceId}/members`, { memberUserId, newRole });
+        return response.data;
+    }
+
+    public static removeMember = async (workspaceId: string, memberId: string) => {
+        const response = await api.delete(`/workspaces/${workspaceId}/members/${memberId}`);
+        return response.data;
+    }
 };
 
 export default WorkspaceServices;

@@ -11,6 +11,11 @@ export class AuthServices {
         return response.data;
     }
 
+    public static checkAccount = async (email: string) => {
+        const response = await api.post('/auth/check-user', { email })
+        return response.data;
+    }
+
     // public static logout = async () => {
     //     await api.post('/auth/sign-out')
     // }

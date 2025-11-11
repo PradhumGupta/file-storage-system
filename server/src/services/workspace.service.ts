@@ -57,7 +57,10 @@ export class WorkspaceServices {
                     where: { parentId: null }
                 },
                 files: {
-                    where: { folderId: null }
+                    where: { folderId: null },
+                    include: { uploader: {
+                        select: { name: true }
+                    } }
                 }
             }
         })
@@ -125,5 +128,25 @@ export class WorkspaceServices {
         });
 
         return members.map(({ user, createdAt, role }) => ({ ...user, joinedAt: createdAt, role }));
+    }
+
+    public roleChange = async (workspaceId: string, actorRole: WorkspaceRole, userId: string, newRole: WorkspaceRole) => {
+        const target = await prisma.membership.findFirst({ where: { userId, workspaceId } });
+        if(!target) throw new Error("target membership not found");
+
+        if(target.role === WorkspaceRole.OWNER && actorRole !== WorkspaceRole.OWNER) {
+            throw new Error("Cannot change the role of owner unless one is owner");
+        }
+
+        if(newRole === WorkspaceRole.OWNER && actorRole !== WorkspaceRole.OWNER) {
+            throw new Error("Cannot make the owner unless one is owner");
+        }
+
+        await prisma.membership.update({
+            where: { id: target.id },
+            data: {
+                role: newRole
+            }
+        });
     }
 }

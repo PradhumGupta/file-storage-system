@@ -42,6 +42,8 @@ function App() {
             </Route>
 
 
+        {/* need to  set a useEffect for params so that if one change them - it will immediately check if it exists or not, also check is there the need of doing this */}
+
         <Route path="*" element={<p>404. Page not found</p>} />
       </Routes>
       <Toaster />

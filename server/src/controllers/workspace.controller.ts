@@ -25,7 +25,7 @@ export class WorkspaceController {
             res.status(201).json(workspace);
         } catch (error: any) {
             console.error("Error in createOrg controller", error);
-            res.status(500).json({ message: error.message ?? "Server Error" });
+            throw error;
         }
     }
 
@@ -36,8 +36,8 @@ export class WorkspaceController {
 
             res.status(200).json({ message: "Fetched files and folders in the workspace successfully", workspace });
         } catch (error: any) {
-            console.error("Error in listFoldersFiles controller", error);
-            res.status(500).json({ message: error.message ?? "Server Error" });
+            console.log("Error in listFoldersFiles controller", error);
+            throw error;
         }
     }
 
@@ -52,24 +52,23 @@ export class WorkspaceController {
 
             res.status(201).json({ message: "membership of the given user added with role", membership: memberships })
         } catch (error: any) {
-            console.error("Error in invite controller", error);
-            res.status(500).json({ message: error.message ?? "Server Error" });
+            console.log("Error in invite controller", error?.message);
+            throw error;
         }
     }
 
     public static remove = async (req: AuthRequest, res: Response) => {
         try {
-            const { workspaceId } = req.params;
-            const { memberUserId } = req.body;
-            const userRole = (req as any).membership.role as WorkspaceRole;
+            const { workspaceId, memberId } = req.params;
+            const userRole = req.user?.role as WorkspaceRole;
 
-            await workspaceServices.removeMember(workspaceId, userRole, memberUserId)
+            await workspaceServices.removeMember(workspaceId, userRole, memberId);
 
             res.json({ message: "target membership removed" });
 
         } catch (error: any) {
-            console.error("Error in remove member controller", error);
-            res.status(500).json({ message: error.message ?? "Server Error" });
+            console.log("Error in remove member controller", error?.message);
+            throw error
         }
     }
 
@@ -83,7 +82,7 @@ export class WorkspaceController {
 
         } catch (error: any) {
             console.error("Error in remove member controller", error);
-            res.status(500).json({ message: error.message ?? "Server Error" });
+            throw error;
         }
     }
 
@@ -105,4 +104,20 @@ export class WorkspaceController {
       throw error    
     }
   }
+
+  public static changeRole = async (req: AuthRequest, res: Response) => {
+        try {
+            const { workspaceId } = req.params;
+            const { memberUserId, newRole } = req.body;
+            const userRole = req.user?.role as WorkspaceRole;
+
+            await workspaceServices.roleChange(workspaceId, userRole, memberUserId, newRole)
+
+            res.json({ message: "target membership changed" });
+
+        } catch (error: any) {
+            console.log("Error in remove member controller", error?.message);
+            throw error;
+        }
+    }
 }

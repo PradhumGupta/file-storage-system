@@ -27,57 +27,54 @@ interface props {
 }
 
 export default function MoreOptions({ type, item }: props) {
-
-  const {activeWorkspace} = useWorkspace();
+  const { activeWorkspace } = useWorkspace();
 
   const handleEdit = () => {
     toast.success(`Editing`);
   };
 
   const handleDelete = async () => {
-    if(type == 'folder') {
+    if (type == "folder") {
       FileServices.deleteFolder(activeWorkspace?.id, item.id)
-        .then(message => toast.success(message))
+        .then((message) => toast.success(message))
         .catch(() => toast.error("An error occurred"));
-
     }
     toast.error(`Deleting`);
   };
 
   const handleFileOpen = async () => {
-    const res = await FileServices.downloadFile(activeWorkspace?.id, item.id)
+    const res = await FileServices.downloadFile(activeWorkspace?.id, item.id);
     if (res.downloadUrl) {
-    window.open(res.downloadUrl, "_blank");
-  } else {
-    alert("Failed to generate download link");
-  }
+      window.open(res.downloadUrl, "_blank");
+    } else {
+      alert("Failed to generate download link");
+    }
   };
 
   const handleFileDownload = async () => {
-    const file = await FileServices.downloadFile(activeWorkspace?.id, item.id)
+    const file = await FileServices.downloadFile(activeWorkspace?.id, item.id);
     if (file) {
+      const url = window.URL.createObjectURL(new Blob([file]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", item.filename);
+      document.body.appendChild(link);
+      link.click();
 
-    const url = window.URL.createObjectURL(new Blob([file]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', item.filename);
-    document.body.appendChild(link);
-    link.click();
+      console.log(link);
 
-    console.log(link)
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
 
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(link);
+      // // Create a temporary link and click it
+      // const link = document.createElement('a');
 
-    // // Create a temporary link and click it
-    // const link = document.createElement('a');
-    
-    // // Append the download query parameter to force download
-    // link.href = `${res.downloadUrl}&download`;
-    // link.click();
-  } else {
-    alert("Failed to download");
-  }
+      // // Append the download query parameter to force download
+      // link.href = `${res.downloadUrl}&download`;
+      // link.click();
+    } else {
+      alert("Failed to download");
+    }
   };
 
   return (
@@ -97,21 +94,22 @@ export default function MoreOptions({ type, item }: props) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">
         <DropdownMenuItem>
-            <Link to={`/dashboard/${type}/${item.id}`} className="flex gap-2 items-center">
+          <Link
+            to={`/dashboard/${type}/${item.id}`}
+            className="flex gap-2 items-center"
+          >
             <SquareArrowOutUpRightIcon className="w-4 h-4 mr-2" />
             <span>Open</span>
           </Link>
-          
         </DropdownMenuItem>
 
         {/* Download action - only for files */}
-        {type === "file" && 
+        {type === "file" && (
           <DropdownMenuItem onClick={() => handleFileDownload()}>
             <Download className="w-4 h-4 mr-2" />
             Download
           </DropdownMenuItem>
-        }
-        
+        )}
 
         <DropdownMenuSeparator />
 

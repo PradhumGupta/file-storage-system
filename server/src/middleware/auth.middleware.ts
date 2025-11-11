@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { verifyAccessToken } from "../utils/jwt";
+import { TeamRole, WorkspaceRole } from "@prisma/client";
 
 const { ACCESS_TOKEN_SECRET } = process.env;
 
 export interface AuthRequest extends Request {
-  user?: { id: string };
+  user?: { id: string, role?: WorkspaceRole | TeamRole };
 }
 
 export const authenticate = async (

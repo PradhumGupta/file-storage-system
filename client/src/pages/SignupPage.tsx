@@ -4,6 +4,8 @@ import Header from "../layouts/Header";
 import api from "../lib/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { Spinner } from "@/components/ui/spinner";
+import { AuthServices } from "@/services/auth.api";
 
 const SignupPage = () => {
   const [step, setStep] = useState(1);
@@ -13,6 +15,7 @@ const SignupPage = () => {
     lastName: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate();
 
@@ -25,42 +28,33 @@ const SignupPage = () => {
     }));
   };
 
-  // Handles form submission (simplified)
-  const handleSubmit = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    console.log("Form submitted with data:", formData);
-    // signUp(formData);
-  };
-
   const handleContinue = async () => {
-    if (step === 1) {
-      // You can capture the email here before moving to the next step
-      api.post("/auth/check-user", {email: formData.email})
-      .then(response => {
-        console.log(response)
+    try {
+      setLoading(true);
+      if (step === 1) {
+        // You can capture the email here before moving to the next step
 
-      if(response.data?.found == true) {
-        return toast.error("User already exists");
+        const response = await AuthServices.checkAccount(formData.email);
+        if (response?.found == true) {
+          return toast.error("User already exists");
+        }
+      } else if (step === 2) {
+        const name = formData.firstName + " " + formData.lastName;
+        await AuthServices.signup(
+          name,
+          formData.email,
+          formData.password
+        );
+
+        toast.success("Account created successfully");
+
+        navigate("/login");
       }
-      })
-      .catch(error => console.log(error))
 
-
-      console.log("Email captured:", formData.email);
-    } else if (step === 2) {
-      api.post("/auth/register", {email: formData.email, name: formData.firstName + " " + formData.lastName, password: formData.password })
-      .then(response => {
-        console.log(response)
-        navigate("/dashboard")
-      if(response.data?.found == true) {
-        return toast.error("User already exists");
-      }
-      })
-      .catch(error => console.log(error))
-      console.log("Form data ready to be sent to backend:", formData);
+      setStep((prevStep) => prevStep + 1);
+    } catch (error) {
+      if (error instanceof Error) toast.error(error.message);
     }
-
-    setStep((prevStep) => prevStep + 1);
   };
 
   const handleBack = () => {
@@ -121,7 +115,7 @@ const SignupPage = () => {
               onClick={handleContinue}
               className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md cursor-pointer"
             >
-              Continue
+              {loading ? <Spinner className="size-6 text-blue-200" /> : "Continue"}
             </button>
           </div>
         );

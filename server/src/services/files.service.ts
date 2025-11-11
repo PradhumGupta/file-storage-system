@@ -47,7 +47,7 @@ export class FileServices {
   public getFiles = async (workspaceId: string, folderId: string) => {
     const files = await prisma.file.findMany({
       where: { workspaceId, folderId },
-      include: { uploader: true },
+      select: { uploader: { select: { id: true, name: true } } },
     });
 
     return files;

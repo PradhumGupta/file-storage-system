@@ -17,11 +17,11 @@ router.get("/files/:fileId/download", authenticate, requireWorkspaceMember, File
 
 // router.get("/folders/:folderId/files", authenticate, requireWorkspaceMember, FileController.ListFiles); use showFolder instead
 
-router.post("/folders", authenticate, requireWorkspaceMember, requireWorkspaceRole([WorkspaceRole.OWNER, WorkspaceRole.ADMIN]), FileController.createFolder);
+router.post("/folders", authenticate, requireWorkspaceMember, checkAccess("folder", "create"), FileController.createFolder);
 
 router.get("/folders", authenticate, requireWorkspaceMember, requireWorkspaceRole([WorkspaceRole.OWNER, WorkspaceRole.ADMIN]), FileController.getFolders);
 
-router.get("/folders/:folderId", authenticate, requireWorkspaceMember, FileController.showFolder);
+router.get("/folders/:folderId", authenticate, requireWorkspaceMember, checkAccess("folder", "view"), FileController.showFolder);
 
 router.get("/folders/:folderId/path", authenticate, requireWorkspaceMember, FileController.getPath);
 

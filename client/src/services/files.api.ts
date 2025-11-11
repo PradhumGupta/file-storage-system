@@ -9,12 +9,20 @@ class FileServices {
         const response = await api.get(`/workspaces/${workspaceId}/folders/${folderId}/path`);
         return response.data.path
     }
-    public static upload = async (workspaceId: string, folderId: string, file: File) => {
+    public static upload = async (workspaceId: string, folderId: string, file: File, onProgress?: (percent: number) => void, signal?: AbortSignal) => {
         const formData = new FormData();
         formData.append("folderId", folderId);
         formData.append("file", file)
         
-        const response = await api.post(`/workspaces/${workspaceId}/files/upload`, formData);
+        const response = await api.post(`/workspaces/${workspaceId}/files/upload`, formData, {
+            onUploadProgress: (progressEvent) => {
+                if(progressEvent.total) {
+                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    if (onProgress) onProgress(percent);
+                }
+            },
+            signal
+        });
         return response.data.status;
     }
     public static downloadFile = async (workspaceId: string, fileId: string) => {

@@ -26,6 +26,7 @@ export interface File {
   createdAt: string;
   updatedAt: string;
   folderId: string;
+  uploader: { name: string }
 }
 
 export interface Membership {
@@ -39,6 +40,10 @@ export interface WorkspaceContextType {
   setWorkspace: (workspace: Workspace) => void;
   setFolder: (folder: Folder | null) => void;
   clearWorkspace: () => void;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  role: string;
+  setRole: React.Dispatch<React.SetStateAction<string>>
 }
 
 export const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);

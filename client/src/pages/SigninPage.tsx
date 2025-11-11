@@ -4,6 +4,7 @@ import { AuthServices } from "../services/auth.api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
+import { Spinner } from "@/components/ui/spinner";
 
 const SigninPage = () => {
   const navigate = useNavigate();
@@ -24,15 +25,15 @@ const SigninPage = () => {
   };
 
   // Handles form submission (simplified)
-  const handleSubmit =async (e: any) => {
+  const handleSubmit =async (e: SubmitEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       const response = await AuthServices.login(formData.email, formData.password);
       login(response?.user)
-    } catch (error: any) {
-      console.log(error)
-      toast.error(error.response?.data?.message || "An error occurred")
+      toast.success("logged in successfully")
+    } catch (error: unknown) {
+      if(error instanceof Error) toast.error(error.message)
     } finally {
       setLoading(false);
     }
@@ -116,9 +117,10 @@ const SigninPage = () => {
                 />
                 
               <button type="submit"
-              className="w-full py-3 my-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md cursor-pointer"
+              disabled={loading}
+              className="w-full py-3 my-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md cursor-pointer flex justify-center"
             >
-              Continue
+              {loading ? <Spinner className="size-6 text-blue-200" /> : "Continue"}
             </button>
               </form>
             </div>

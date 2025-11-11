@@ -20,12 +20,12 @@ export const permissions: Permissions = {
     'create': [ "OWNER", "ADMIN", "MEMBER", "TEAM_ADMIN" ],
     'upload': [ "OWNER", "ADMIN", "MEMBER", "TEAM_ADMIN", "TEAM_MEMBER" ],
     'delete': [ "OWNER", "ADMIN", "TEAM_ADMIN" ],
-    'view': [ "OWNER", "ADMIN", "MEMBER", "VIEWER" ],
+    'view': [ "OWNER", "ADMIN", "MEMBER", "VIEWER", "TEAM_ADMIN", "TEAM_MEMBER", "TEAM_VIEWER"],
   },
 
   'file': {
-    'view': [ "OWNER", "ADMIN", "MEMBER", "VIEWER" ],
-    'delete': [ "OWNER", "ADMIN" ],
-    'update': [ "OWNER", "ADMIN", "MEMBER" ],
+    'view': [ "OWNER", "ADMIN", "MEMBER", "VIEWER", "TEAM_ADMIN", "TEAM_MEMBER", "TEAM_VIEWER" ],
+    'delete': [ "OWNER", "ADMIN", "TEAM_ADMIN" ],
+    'update': [ "OWNER", "ADMIN", "MEMBER", "TEAM_ADMIN", "TEAM_MEMBER" ],
   },
 };

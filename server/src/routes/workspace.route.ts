@@ -19,7 +19,9 @@ router.get("/:workspaceId/members", requireWorkspaceMember, WorkspaceController.
 
 router.post("/:workspaceId/members", requireWorkspaceMember, checkAccess("workspace", "manage"), WorkspaceController.invite);
 
-router.delete("/:workspaceId/members", requireWorkspaceMember, checkAccess("workspace", "manage"), WorkspaceController.remove);
+router.delete("/:workspaceId/members/:memberId", requireWorkspaceMember, checkAccess("workspace", "manage"), WorkspaceController.remove);
+
+router.patch("/:workspaceId/members", requireWorkspaceMember, checkAccess("workspace", "manage"), WorkspaceController.changeRole);
 
 router.get("/:workspaceId/other-users", requireWorkspaceMember, checkAccess("workspace", "manage"), WorkspaceController.getUsers);
 
