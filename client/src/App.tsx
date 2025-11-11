@@ -1,4 +1,4 @@
-import { Navigate, Outlet, Route, Routes } from "react-router-dom"
+import { Navigate, Outlet, Route, Routes, useParams } from "react-router-dom"
 import Dashboard from "./pages/Dashboard"
 import SignupPage from "./pages/SignupPage"
 import SigninPage from "./pages/SigninPage"
@@ -20,9 +20,10 @@ const PrivateRoute = () => {
   return <Outlet />;
 };
 
-function WorkspaceLayout() {
+function WorkspaceBoundary() {
+  const { workspaceName } = useParams();
   return (
-    <WorkspaceProvider>
+    <WorkspaceProvider workspaceName={workspaceName}>
       <Outlet />
     </WorkspaceProvider>
   )
@@ -39,7 +40,7 @@ function App() {
 
         {/* Protected Routes */}
             <Route path="dashboard" element={<PrivateRoute />}>
-              <Route path=":workspaceName" element={<WorkspaceLayout />}>
+              <Route path=":workspaceName" element={<WorkspaceBoundary />}>
                 <Route index element={<Dashboard />} />
                 <Route path="folder/:folderId" element={<Dashboard />} />
                 <Route path="members" element={<MembersPage />} />

@@ -1,11 +1,11 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { WorkspaceContext, type Folder, type Membership, type Workspace } from "./WorkspaceContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { slugify } from "@/utils/slugify";
 import WorkspaceServices from "@/services/workspace.api";
 import toast from "react-hot-toast";
 
-const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
+const WorkspaceProvider = ({ children, workspaceName }: { children: ReactNode, workspaceName: string|undefined }) => {
   const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
   const [activeFolder, setActiveFolder] = useState<Folder | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,13 +22,11 @@ const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
     setActiveFolder(null);
   };
 
-  const { workspaceName } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
 
     const fetchWorkspace = async () => {
-      console.log("workspace", workspaceName)
       if (!workspaceName) {
         navigate("/dashboard/personal");
         return;
@@ -61,10 +59,9 @@ const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     };
-    // keep calling and running useEffect everytime makes unnecessary calls
 
     fetchWorkspace();
-  }, [workspaceName, navigate]);
+  }, []);
 
   return (
     <WorkspaceContext.Provider
