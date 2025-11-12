@@ -3,7 +3,7 @@ import { AuthServices } from "../services/auth.api";
 
 const api = axios.create({
     // baseURL: import.meta.env.MODE === "development" ? "/api" : "http://localhost:8080/api",
-    baseURL: "http://localhost:8080/api",
+    baseURL: import.meta.env.PROD ? "https://file-storage-system-6ez8.onrender.com" : "http://localhost:8080/api",
     withCredentials: true
 });
 
