@@ -1,15 +1,9 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.requireWorkspaceRole = exports.requireWorkspaceMember = void 0;
-const prisma_1 = __importDefault(require("../config/prisma"));
-const requireWorkspaceMember = async (req, res, next) => {
+import prisma from "../config/prisma";
+export const requireWorkspaceMember = async (req, res, next) => {
     try {
         const workspaceId = req.params.workspaceId;
         const userId = req.user.id;
-        const membership = await prisma_1.default.membership.findFirst({
+        const membership = await prisma.membership.findFirst({
             where: { workspaceId, userId }
         });
         if (!membership)
@@ -21,8 +15,7 @@ const requireWorkspaceMember = async (req, res, next) => {
         throw error;
     }
 };
-exports.requireWorkspaceMember = requireWorkspaceMember;
-const requireWorkspaceRole = (allowed) => (req, res, next) => {
+export const requireWorkspaceRole = (allowed) => (req, res, next) => {
     const membership = req.membership;
     if (!membership)
         return res.status(500).json({ error: "Membership context missing" });
@@ -31,4 +24,3 @@ const requireWorkspaceRole = (allowed) => (req, res, next) => {
     console.log("role checked for user", req.user.id);
     next();
 };
-exports.requireWorkspaceRole = requireWorkspaceRole;

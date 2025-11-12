@@ -1,19 +1,13 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FileController = void 0;
-const files_service_1 = require("../services/files.service");
-const zod_1 = __importDefault(require("zod"));
-const workspaceIdCheck = zod_1.default.object({
-    workspaceId: zod_1.default.string().min(8, "WorkspaceId is required")
+import { FileServices } from "../services/files.service";
+import z from "zod";
+const workspaceIdCheck = z.object({
+    workspaceId: z.string().min(8, "WorkspaceId is required")
 });
-const folderIdCheck = zod_1.default.object({
-    folderId: zod_1.default.string().min(8, "folderId is required")
+const folderIdCheck = z.object({
+    folderId: z.string().min(8, "folderId is required")
 });
-const fileServices = new files_service_1.FileServices();
-class FileController {
+const fileServices = new FileServices();
+export class FileController {
     static fileUpload = async (req, res, next) => {
         try {
             const { workspaceId } = req.params;
@@ -128,4 +122,3 @@ class FileController {
         }
     };
 }
-exports.FileController = FileController;

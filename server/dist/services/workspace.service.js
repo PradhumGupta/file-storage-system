@@ -1,14 +1,8 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.WorkspaceServices = void 0;
-const client_1 = require("@prisma/client");
-const prisma_1 = __importDefault(require("../config/prisma"));
-class WorkspaceServices {
+import { WorkspaceRole, WorkspaceType } from "@prisma/client";
+import prisma from "../config/prisma";
+export class WorkspaceServices {
     static createPersonalWorkspace = async (name, userId) => {
-        const personal = await prisma_1.default.workspace.create({
+        const personal = await prisma.workspace.create({
             data: {
                 name: `${name}'s Workspace`,
                 type: "PERSONAL",
@@ -23,7 +17,7 @@ class WorkspaceServices {
         return personal;
     };
     listUserWorkspaces = async (userId) => {
-        const memberships = await prisma_1.default.membership.findMany({
+        const memberships = await prisma.membership.findMany({
             where: { userId },
             include: { workspace: true },
             orderBy: { createdAt: "asc" }
@@ -34,14 +28,14 @@ class WorkspaceServices {
         }));
     };
     createOrgWorkspace = async (ownerUserId, workspaceName) => {
-        const workspace = await prisma_1.default.workspace.create({
+        const workspace = await prisma.workspace.create({
             data: {
                 name: workspaceName,
-                type: client_1.WorkspaceType.ORGANIZATION,
+                type: WorkspaceType.ORGANIZATION,
                 memberships: {
                     create: {
                         userId: ownerUserId,
-                        role: client_1.WorkspaceRole.OWNER
+                        role: WorkspaceRole.OWNER
                     }
                 }
             }
@@ -49,7 +43,7 @@ class WorkspaceServices {
         return workspace;
     };
     fetchWorkspace = async (workspaceId) => {
-        const workspace = await prisma_1.default.workspace.findUnique({
+        const workspace = await prisma.workspace.findUnique({
             where: { id: workspaceId },
             include: {
                 folders: {
@@ -66,11 +60,11 @@ class WorkspaceServices {
         return workspace;
     };
     inviteMember = async (workspaceId, actorUserId, userIds, role) => {
-        const actor = await prisma_1.default.membership.findFirst({
+        const actor = await prisma.membership.findFirst({
             where: { userId: actorUserId, workspaceId }
         });
         // prevent duplicate
-        const existingMemberships = await prisma_1.default.membership.findMany({
+        const existingMemberships = await prisma.membership.findMany({
             where: {
                 workspaceId,
                 userId: { in: userIds },
@@ -84,28 +78,28 @@ class WorkspaceServices {
             userId,
             role,
         }));
-        const memberships = await prisma_1.default.membership.createMany({
+        const memberships = await prisma.membership.createMany({
             data: newMemberships,
         });
         return memberships;
     };
     removeMember = async (workspaceId, actorRole, userId) => {
-        const target = await prisma_1.default.membership.findFirst({ where: { userId, workspaceId } });
+        const target = await prisma.membership.findFirst({ where: { userId, workspaceId } });
         if (!target)
             throw new Error("target membership not found");
-        if (target.role === client_1.WorkspaceRole.OWNER) {
-            const owners = await prisma_1.default.membership.count({
-                where: { workspaceId, role: client_1.WorkspaceRole.OWNER },
+        if (target.role === WorkspaceRole.OWNER) {
+            const owners = await prisma.membership.count({
+                where: { workspaceId, role: WorkspaceRole.OWNER },
             });
             if (owners <= 1)
                 throw new Error("Cannot remove only OWNER");
-            if (actorRole !== client_1.WorkspaceRole.OWNER)
+            if (actorRole !== WorkspaceRole.OWNER)
                 throw new Error("Cannot remove the owner unless one is owner");
         }
-        await prisma_1.default.membership.delete({ where: { id: target.id } });
+        await prisma.membership.delete({ where: { id: target.id } });
     };
     getMembers = async (workspaceId) => {
-        const members = await prisma_1.default.membership.findMany({
+        const members = await prisma.membership.findMany({
             where: {
                 workspaceId
             },
@@ -116,16 +110,16 @@ class WorkspaceServices {
         return members.map(({ user, createdAt, role }) => ({ ...user, joinedAt: createdAt, role }));
     };
     roleChange = async (workspaceId, actorRole, userId, newRole) => {
-        const target = await prisma_1.default.membership.findFirst({ where: { userId, workspaceId } });
+        const target = await prisma.membership.findFirst({ where: { userId, workspaceId } });
         if (!target)
             throw new Error("target membership not found");
-        if (target.role === client_1.WorkspaceRole.OWNER && actorRole !== client_1.WorkspaceRole.OWNER) {
+        if (target.role === WorkspaceRole.OWNER && actorRole !== WorkspaceRole.OWNER) {
             throw new Error("Cannot change the role of owner unless one is owner");
         }
-        if (newRole === client_1.WorkspaceRole.OWNER && actorRole !== client_1.WorkspaceRole.OWNER) {
+        if (newRole === WorkspaceRole.OWNER && actorRole !== WorkspaceRole.OWNER) {
             throw new Error("Cannot make the owner unless one is owner");
         }
-        await prisma_1.default.membership.update({
+        await prisma.membership.update({
             where: { id: target.id },
             data: {
                 role: newRole
@@ -133,4 +127,3 @@ class WorkspaceServices {
         });
     };
 }
-exports.WorkspaceServices = WorkspaceServices;

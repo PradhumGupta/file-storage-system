@@ -1,10 +1,7 @@
-"use strict";
 // prismaClient
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.main = main;
-const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
-async function main() {
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+export async function main() {
     try {
         await prisma.$connect();
         console.log('Connected to the database');
@@ -15,4 +12,4 @@ async function main() {
     }
 }
 main();
-exports.default = prisma;
+export default prisma;

@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.WorkspaceController = void 0;
-const workspace_service_1 = require("../services/workspace.service");
-const auth_service_1 = require("../services/auth.service");
-const workspaceServices = new workspace_service_1.WorkspaceServices();
-const authService = new auth_service_1.AuthService();
-class WorkspaceController {
+import { WorkspaceServices } from "../services/workspace.service";
+import { AuthService } from "../services/auth.service";
+const workspaceServices = new WorkspaceServices();
+const authService = new AuthService();
+export class WorkspaceController {
     static getUserWorkspaces = async (req, res, next) => {
         try {
             const userId = req.user.id;
@@ -104,4 +101,3 @@ class WorkspaceController {
         }
     };
 }
-exports.WorkspaceController = WorkspaceController;

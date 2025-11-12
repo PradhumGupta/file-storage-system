@@ -1,32 +1,26 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkAccess = void 0;
-const prisma_1 = __importDefault(require("../config/prisma"));
-const permissions_1 = require("../config/permissions");
-const checkAccess = (resource, action) => {
+import prisma from "../config/prisma";
+import { permissions } from "../config/permissions";
+export const checkAccess = (resource, action) => {
     return async (req, res, next) => {
         const userId = req.user.id;
         let resourceData = null;
         let userRole;
         switch (resource) {
             case "workspace":
-                const workspaceMembers = await prisma_1.default.membership.findMany({
+                const workspaceMembers = await prisma.membership.findMany({
                     where: { workspaceId: req.params.workspaceId }
                 });
                 userRole = workspaceMembers.find(m => m.userId === userId)?.role;
                 break;
             case "team":
-                const teamMembers = await prisma_1.default.teamMember.findMany({
+                const teamMembers = await prisma.teamMember.findMany({
                     where: { id: req.params.teamId },
                 });
                 userRole = teamMembers.find(m => m.userId === userId)?.role || req.membership.role;
                 ;
                 break;
             case "folder":
-                resourceData = await prisma_1.default.folder.findFirst({
+                resourceData = await prisma.folder.findFirst({
                     where: { id: req.params.folderId },
                     include: {
                         workspace: { include: { memberships: true } },
@@ -39,7 +33,7 @@ const checkAccess = (resource, action) => {
                 // if(resourceData?.teamId && !teamMember) return res.status(403).json({ error: "Access denied" });
                 break;
             case "file":
-                resourceData = await prisma_1.default.file.findFirst({
+                resourceData = await prisma.file.findFirst({
                     where: { id: req.params.fileId },
                     include: {
                         folder: {
@@ -61,7 +55,7 @@ const checkAccess = (resource, action) => {
         if (!userRole) {
             return res.status(403).json({ error: "Not a member of this resource" });
         }
-        const allowedRoles = permissions_1.permissions[resource][action];
+        const allowedRoles = permissions[resource][action];
         if (!allowedRoles.includes(userRole)) {
             return res.status(403).json({ error: "Access denied" });
         }
@@ -69,4 +63,3 @@ const checkAccess = (resource, action) => {
         next();
     };
 };
-exports.checkAccess = checkAccess;

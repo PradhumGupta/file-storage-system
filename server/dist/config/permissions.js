@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.permissions = void 0;
-exports.permissions = {
+export const permissions = {
     'workspace': {
         'manage': ["OWNER", "ADMIN"], // invite, team
         'view': ["OWNER", "ADMIN", "MEMBER", "VIEWER"],

@@ -1,12 +1,7 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const prisma_1 = __importDefault(require("../config/prisma"));
+import prisma from "../config/prisma";
 class TeamServices {
     create = async (teamName, description, workspaceId) => {
-        const newTeam = await prisma_1.default.team.create({
+        const newTeam = await prisma.team.create({
             data: {
                 name: teamName,
                 desc: description,
@@ -16,7 +11,7 @@ class TeamServices {
         return newTeam;
     };
     getAllTeams = async (workspaceId) => {
-        const teams = await prisma_1.default.team.findMany({
+        const teams = await prisma.team.findMany({
             where: {
                 workspaceId,
             },
@@ -35,7 +30,7 @@ class TeamServices {
         return teamWithMemberCount;
     };
     getTeam = async (workspaceId, teamId) => {
-        const team = await prisma_1.default.team.findFirst({
+        const team = await prisma.team.findFirst({
             where: {
                 id: teamId,
                 workspaceId,
@@ -59,7 +54,7 @@ class TeamServices {
         return team;
     };
     addMember = async (userId, teamId, role) => {
-        const newMember = await prisma_1.default.teamMember.create({
+        const newMember = await prisma.teamMember.create({
             data: {
                 userId,
                 teamId,
@@ -69,7 +64,7 @@ class TeamServices {
         return newMember;
     };
     listMembers = async (teamId) => {
-        const members = await prisma_1.default.teamMember.findMany({
+        const members = await prisma.teamMember.findMany({
             where: {
                 teamId: teamId
             },
@@ -91,4 +86,4 @@ class TeamServices {
     };
 }
 ;
-exports.default = TeamServices;
+export default TeamServices;

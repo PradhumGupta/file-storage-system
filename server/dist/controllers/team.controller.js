@@ -1,12 +1,7 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const team_service_1 = __importDefault(require("../services/team.service"));
-const files_service_1 = require("../services/files.service");
-const teamServices = new team_service_1.default();
-const fileServices = new files_service_1.FileServices();
+import TeamServices from "../services/team.service";
+import { FileServices } from "../services/files.service";
+const teamServices = new TeamServices();
+const fileServices = new FileServices();
 class TeamController {
     static createTeam = async (req, res, next) => {
         try {
@@ -104,4 +99,4 @@ class TeamController {
     };
 }
 ;
-exports.default = TeamController;
+export default TeamController;

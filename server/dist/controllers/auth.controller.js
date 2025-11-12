@@ -1,21 +1,18 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthController = void 0;
-const zod_1 = require("zod");
-const auth_service_1 = require("../services/auth.service");
-const jwt_1 = require("../utils/jwt");
-const set_token_cookies_1 = require("../utils/set-token-cookies");
-const registerSchema = zod_1.z.object({
-    name: zod_1.z.string().trim(),
-    email: zod_1.z.string().email(),
-    password: zod_1.z.string().min(6),
+import { z } from "zod";
+import { AuthService } from "../services/auth.service";
+import { verifyRefreshToken } from "../utils/jwt";
+import { setCookies } from "../utils/set-token-cookies";
+const registerSchema = z.object({
+    name: z.string().trim(),
+    email: z.string().email(),
+    password: z.string().min(6),
 });
-const loginSchema = zod_1.z.object({
-    email: zod_1.z.string().email(),
-    password: zod_1.z.string().min(6),
+const loginSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
 });
-const authService = new auth_service_1.AuthService();
-class AuthController {
+const authService = new AuthService();
+export class AuthController {
     static SignUp = async (req, res, next) => {
         try {
             const { name, email, password } = registerSchema.parse(req.body);
@@ -31,7 +28,7 @@ class AuthController {
         try {
             const { email, password } = loginSchema.parse(req.body);
             const { accessToken, refreshToken, user } = await authService.login(email, password);
-            (0, set_token_cookies_1.setCookies)(res, accessToken, refreshToken);
+            setCookies(res, accessToken, refreshToken);
             res.json({ message: "User logged in", accessToken, refreshToken, user });
         }
         catch (error) {
@@ -42,9 +39,9 @@ class AuthController {
     static refresh = async (req, res) => {
         const token = req.cookies.refresh_token || req.body.token;
         try {
-            const decoded = (0, jwt_1.verifyRefreshToken)(token);
+            const decoded = verifyRefreshToken(token);
             const accessToken = await authService.refresh(decoded.id, token);
-            (0, set_token_cookies_1.setCookies)(res, accessToken, token);
+            setCookies(res, accessToken, token);
             res.status(201).json({ message: "Token refreshed", accessToken });
         }
         catch (error) {
@@ -85,4 +82,3 @@ class AuthController {
         }
     };
 }
-exports.AuthController = AuthController;
