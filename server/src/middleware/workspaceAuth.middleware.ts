@@ -13,14 +13,13 @@ export const requireWorkspaceMember = async (req: AuthRequest, res: Response, ne
             where: { workspaceId, userId }
         });
 
-        if(!membership) return res.status(403).json({ error: "Unidentified member" });
+        if(!membership) throw new Error("Unidentified member");
 
         (req as any).membership = membership;
-        console.log("Membership found for user", userId)
         next();
 
     } catch (error) {
-        res.status(500).json({ error: "Workspace membership check failed" });
+        throw error;
     }
 };
 

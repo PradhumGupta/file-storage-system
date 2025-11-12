@@ -16,9 +16,9 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const corsOptions = {
-  origin: 'http://localhost:5173', // Replace with your frontend's actual origin
+  origin: ['http://localhost:5173', process.env.CLIENT_URL!],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true, // Allow sending cookies and authorization headers
+  credentials: true,
 };
 
 app.use(cors(corsOptions));

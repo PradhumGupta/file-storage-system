@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const team_controller_1 = __importDefault(require("../controllers/team.controller"));
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const workspaceAuth_middleware_1 = require("../middleware/workspaceAuth.middleware");
+const check_access_middleware_1 = require("../middleware/check-access.middleware");
+const router = (0, express_1.Router)({ mergeParams: true });
+router.use(auth_middleware_1.authenticate);
+router.use(workspaceAuth_middleware_1.requireWorkspaceMember);
+router.post('/', (0, check_access_middleware_1.checkAccess)("workspace", "manage"), team_controller_1.default.createTeam);
+router.get('/', team_controller_1.default.getTeams);
+router.get('/:teamId', (0, check_access_middleware_1.checkAccess)("team", "view"), team_controller_1.default.getTeam);
+router.post('/:teamId/add', (0, check_access_middleware_1.checkAccess)("team", "manage"), team_controller_1.default.createMember);
+router.put('/:teamId/folder', (0, check_access_middleware_1.checkAccess)("team", "manage"), team_controller_1.default.assignFolder);
+router.post('/:teamId/folder', (0, check_access_middleware_1.checkAccess)("team", "manage"), team_controller_1.default.createFolder);
+router.get('/:teamId/folders', (0, check_access_middleware_1.checkAccess)("team", "manage"), team_controller_1.default.getFolders);
+exports.default = router;
