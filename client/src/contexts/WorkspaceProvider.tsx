@@ -61,7 +61,7 @@ const WorkspaceProvider = ({ children, workspaceName }: { children: ReactNode, w
     };
 
     fetchWorkspace();
-  }, []);
+  }, [workspaceName]);
 
   return (
     <WorkspaceContext.Provider

@@ -24,7 +24,8 @@ export const checkAccess = (resource: string, action: string) => {
         const teamMembers = await prisma.teamMember.findMany({
           where: { id: req.params.teamId },
         });
-        userRole = teamMembers.find(m => m.userId === userId)?.role;
+        userRole = teamMembers.find(m => m.userId === userId)?.role || (req as any).membership.role ;
+;
         break;
 
       case "folder":
@@ -42,8 +43,7 @@ export const checkAccess = (resource: string, action: string) => {
           (m) => m.userId === userId
         );
         userRole = teamMember?.role || workspaceMember?.role;
-        if(resourceData?.teamId && !teamMember) return res.status(403).json({ error: "Access denied" });
-        console.log(userRole)
+        // if(resourceData?.teamId && !teamMember) return res.status(403).json({ error: "Access denied" });
         break;
 
       case "file":
@@ -64,7 +64,7 @@ export const checkAccess = (resource: string, action: string) => {
         const tm = resourceData?.folder?.team?.members.find(
           (m) => m.userId === userId
         );
-        if(resourceData?.folder?.teamId && !tm) return res.status(403).json({ error: "Access denied" });
+        // if(resourceData?.folder?.teamId && !tm) return res.status(403).json({ error: "Access denied" });
         userRole = tm?.role || wm?.role;
         break;
 

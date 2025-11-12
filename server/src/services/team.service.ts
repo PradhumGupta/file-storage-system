@@ -36,6 +36,33 @@ class TeamServices {
         return teamWithMemberCount;
     }
 
+    public getTeam = async (workspaceId: string, teamId: string) => {
+        const team = await prisma.team.findFirst({
+            where: {
+                id: teamId,
+                workspaceId,
+            },
+            include: {
+                members: {
+                    include: { 
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                createdAt: true
+                            }
+                        }, 
+                        
+                    }
+                },
+                folders: true
+            },
+        });
+        
+        return team
+    }
+
     public addMember = async (userId: string, teamId: string, role: TeamRole) => {
         const newMember = await prisma.teamMember.create({
             data: {

@@ -12,7 +12,7 @@ router.use(requireWorkspaceMember)
 
 router.post('/', checkAccess("workspace", "manage"), TeamController.createTeam);
 router.get('/', TeamController.getTeams);
-router.get('/:teamId', checkAccess("team", "view"), TeamController.getMembers);
+router.get('/:teamId', checkAccess("team", "view"), TeamController.getTeam);
 router.post('/:teamId/add', checkAccess("team", "manage"), TeamController.createMember);
 router.put('/:teamId/folder', checkAccess("team", "manage"), TeamController.assignFolder);
 router.post('/:teamId/folder', checkAccess("team", "manage"), TeamController.createFolder);

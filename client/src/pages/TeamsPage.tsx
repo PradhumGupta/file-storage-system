@@ -35,7 +35,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Sidebar from "@/layouts/Sidebar";
-import WorkspaceSelector from "@/components/WorkspaceSelector";
 import CreateTeamModal from "@/components/CreateTeamModal";
 import InviteModal from "@/components/InviteModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -233,7 +232,6 @@ export default function TeamsPage() {
     "Members"
   );
   const { activeWorkspace } = useWorkspace();
-  const [folders, setFolders] = useState<Folder[]>([]);
   // const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -262,27 +260,27 @@ export default function TeamsPage() {
     ? teams.find((team) => team.id === selectedTeam.id)
     : null;
 
-  const handleTeamSelection = async (team: Team) => {
+  const handleTeamSelection = async (teamId: string) => {
     if (!activeWorkspace) return;
     try {
       setLoading(true);
-      const members = await TeamServices.getMembers(
+      const team = await TeamServices.getTeam(
         activeWorkspace.id,
-        team.id
+        teamId
       );
-      setSelectedTeam(() => {
-        team.members = members;
-        return team;
-      });
+      team.members = team.members.map((member) => ({
+        name: member.user.name,
+        email: member.user.email,
+        joinedAt: member.createdAt,
+        role: member.role
+      }));
 
-      const folders = await TeamServices.getFolders(
-        activeWorkspace.id,
-        team.id
-      );
-      setFolders(folders);
-      setLoading(false);
+      setSelectedTeam(team);
     } catch (error) {
+      console.error(error)
       if (error instanceof Error) toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -304,6 +302,8 @@ export default function TeamsPage() {
 
     fetchTeams();
   }, [activeWorkspace]);
+
+  console.log(selectedTeam)
 
   return (
     <div className="flex bg-gray-100 p-4 font-sans">
@@ -349,7 +349,7 @@ export default function TeamsPage() {
                 <Avatar className="w-12 h-12">
                   <AvatarImage src={user?.avatar} alt={user?.name} />
                   <AvatarFallback>
-                    {user?.name}
+                    {user?.name.split(" ").map((n) => n[0]).join("")}
                   </AvatarFallback>
                 </Avatar>
               </button>
@@ -371,8 +371,7 @@ export default function TeamsPage() {
                     No teams yet
                   </h2>
                   <p className="text-gray-600 mb-8">
-                    Create your first team to start collaborating with your
-                    workspace members.
+                    Create your first team to start collaborating with your workspace members.
                   </p>
                   <Button
                     onClick={() => setIsCreateModalOpen(true)}
@@ -386,7 +385,7 @@ export default function TeamsPage() {
             )
           ) : (
             <div className="p-4">
-              {!selectedTeamData ? (
+              {!selectedTeam ? (
                 <>
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -407,18 +406,13 @@ export default function TeamsPage() {
                   </div>
 
                   {/* Teams Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto">
                     {teams.map((team) => (
                       <Card
                         key={team.id}
-                        className={`group hover:shadow-lg transition-all duration-200 cursor-pointer ${
-                          selectedTeam?.id === team.id
-                            ? "ring-2 ring-blue-500"
-                            : ""
-                        }`}
+                        className="group hover:shadow-lg transition-all duration-200 cursor-pointer"
                         onClick={() => {
-                          setSelectedTeam(team);
-                          handleTeamSelection(team);
+                          handleTeamSelection(team.id);
                         }}
                       >
                         <CardContent className="p-6">
@@ -506,11 +500,11 @@ export default function TeamsPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="text-lg font-semibold text-gray-900">
-                              Team Members ({selectedTeamData.memberCount})
+                              Team Members ({selectedTeam.members.length})
                             </h3>
                             <p className="text-gray-600">
                               Manage members and their roles in{" "}
-                              {selectedTeamData.name}
+                              {selectedTeam.name}
                             </p>
                           </div>
                           <h3
@@ -524,10 +518,10 @@ export default function TeamsPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="text-lg font-semibold text-gray-900">
-                              Team Folders ({selectedTeamData.memberCount})
+                              Team Folders ({selectedTeam.members.length})
                             </h3>
                             <p className="text-gray-600">
-                              Manage folders in {selectedTeamData.name}
+                              Manage folders in {selectedTeam.name}
                             </p>
                           </div>
                           <h3
@@ -555,7 +549,7 @@ export default function TeamsPage() {
                       </div>
 
                       <div className="divide-y divide-gray-200">
-                        {selectedTeamData.members?.map((member) => (
+                        {selectedTeam.members?.map((member) => (
                           <div key={member.id} className="p-4 hover:bg-gray-50">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-4">
@@ -665,7 +659,7 @@ export default function TeamsPage() {
                   {selectedData === "Folders" && (
                     <div className="flex space-y-2 gap-6 overflow-y-auto">
                       {/* Folders in list view */}
-                      {folders.map((folder) => (
+                      {selectedTeam?.folders.map((folder) => (
                         <div
                           key={folder.id}
                           className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer"
@@ -693,6 +687,11 @@ export default function TeamsPage() {
               )}
             </div>
           )}
+          {loading && (
+            <div className="absolute inset-0 flex justify-center items-center z-auto">
+              <Spinner className="size-8 text-gray-900" />
+            </div>
+          )}
         </main>
         <ManageFolders
           isModalOpen={isModalOpen}
@@ -711,7 +710,7 @@ export default function TeamsPage() {
           type={"Team"}
           isInviteModalOpen={isInviteModalOpen}
           setIsInviteModalOpen={setIsInviteModalOpen}
-          selectedTeam={selectedTeam}
+          selectedTeam={selectedTeam!}
         />
       </div>
     </div>

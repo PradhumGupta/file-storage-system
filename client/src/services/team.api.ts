@@ -11,6 +11,11 @@ class TeamServices {
         return response.data.teams;
     }
 
+    public static getTeam = async (workspaceId: string, teamId: string) => {
+        const response = await api.get(`/workspaces/${workspaceId}/team/${teamId}`);
+        return response.data.team;
+    }
+
     public static createMember = async (workspaceId: string, teamId: string, userId: string, role: string) => {
         const response = await api.post(`/workspaces/${workspaceId}/team/${teamId}/add`, { userId, role });
         return response.data.team;

@@ -28,10 +28,25 @@ class TeamController {
 
             const teams = await teamServices.getAllTeams(workspaceId);
 
-            res.status(201).json({ teams })
+            res.status(200).json({ teams })
             
         } catch (error) {
             console.error("Error in creating team", error);
+            next(error)
+        }
+    }
+
+    public static getTeam = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const { workspaceId, teamId } = req.params;
+
+            const team = await teamServices.getTeam(workspaceId, teamId);
+
+            // need to use members + folders instead of this also in frontend
+
+            res.status(200).json({ team })
+        } catch (error) {
+            console.error("Error in getting team", error);
             next(error)
         }
     }

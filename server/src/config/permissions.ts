@@ -11,9 +11,9 @@ export const permissions: Permissions = {
   },
 
   'team': {
-    'manage': [ "TEAM_ADMIN" ], // team admins
-    'edit': [ "TEAM_ADMIN", "TEAM_MEMBER" ],
-    'view': [ "TEAM_ADMIN", "TEAM_MEMBER", "TEAM_VIEWER" ],
+    'manage': [ "OWNER", "ADMIN", "TEAM_ADMIN" ], // team admins
+    'edit': [ "OWNER", "ADMIN", "TEAM_ADMIN", "TEAM_MEMBER" ],
+    'view': [ "OWNER", "ADMIN", "TEAM_ADMIN", "TEAM_MEMBER", "TEAM_VIEWER" ],
   },
 
   'folder': {
