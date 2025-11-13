@@ -61,6 +61,9 @@ function MembersPage() {
   );
 
   const handleRoleChange = async (memberId: string, newRole: string) => {
+    if(!activeWorkspace) {
+      return;
+    }
     try {
       await WorkspaceServices.changeRole(activeWorkspace?.id, memberId, newRole);
     } catch (error) {
@@ -78,11 +81,14 @@ function MembersPage() {
   };
 
   const handleRemoveMember = async (memberId: string, name: string) => {
+    if(!activeWorkspace) {
+      return;
+    }
     try {
-      await WorkspaceServices.removeMember(activeWorkspace?.id, memberId);
+      await WorkspaceServices.removeMember(activeWorkspace.id, memberId);
     } catch (error) {
       if(error instanceof Error) {
-        toast.error(error.message);
+        toast.error(`failed to remove ${name}`);
       } else {
         console.log(error);
       }

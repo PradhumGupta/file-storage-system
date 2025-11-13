@@ -8,11 +8,14 @@ const FileViewer = () => {
   const { activeWorkspace } = useWorkspace();
   const { fileId } = useParams();
   useEffect(() => {
+    if(!activeWorkspace) {
+      return;
+    }
     const fetchFile = async () => {
       try {
         const file = await FileServices.downloadFile(
           activeWorkspace?.id,
-          fileId
+          fileId!
         );
 
         const url = URL.createObjectURL(file);

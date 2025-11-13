@@ -44,8 +44,8 @@ export default function CreateFolderForm({
       setFolders((prev: Folder[]) => [...prev, folder]);
       setOpenForm(false);
       toast.success("Folder created!");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "An error occurred");
+    } catch (error) {
+      if(error instanceof Error)  toast.error(error.message)
     }
   };
 

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import Header from "../layouts/Header";
-import api from "../lib/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
@@ -15,7 +14,7 @@ const SignupPage = () => {
     lastName: "",
     password: "",
   });
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -40,11 +39,7 @@ const SignupPage = () => {
         }
       } else if (step === 2) {
         const name = formData.firstName + " " + formData.lastName;
-        await AuthServices.signup(
-          name,
-          formData.email,
-          formData.password
-        );
+        await AuthServices.signup(name, formData.email, formData.password);
 
         toast.success("Account created successfully");
 
@@ -77,7 +72,7 @@ const SignupPage = () => {
             <div className="space-y-4 w-full">
               <button className="flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors">
                 <img
-                  src="https://www.dropbox.com/static/images/empty_states/sign-in-google-icon@2x-vflMvB9fO.png"
+                  src="https://www.Zenith.com/static/images/empty_states/sign-in-google-icon@2x-vflMvB9fO.png"
                   alt="Google icon"
                   className="w-5 h-5"
                 />
@@ -85,7 +80,7 @@ const SignupPage = () => {
               </button>
               <button className="flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors">
                 <img
-                  src="https://www.dropbox.com/static/images/empty_states/sign-in-apple-icon@2x-vflhE3LhW.png"
+                  src="https://www.Zenith.com/static/images/empty_states/sign-in-apple-icon@2x-vflhE3LhW.png"
                   alt="Apple icon"
                   className="w-5 h-5"
                 />
@@ -115,7 +110,11 @@ const SignupPage = () => {
               onClick={handleContinue}
               className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md cursor-pointer"
             >
-              {loading ? <Spinner className="size-6 text-blue-200" /> : "Continue"}
+              {loading ? (
+                <Spinner className="size-6 text-blue-200" />
+              ) : (
+                "Continue"
+              )}
             </button>
           </div>
         );
@@ -199,7 +198,7 @@ const SignupPage = () => {
             <p className="text-xs text-gray-500 mb-6 text-center">
               By selecting "Agree and sign up" I agree to the{" "}
               <a href="#" className="text-blue-600 hover:underline">
-                Dropbox Terms
+                Zenith Terms
               </a>{" "}
               and{" "}
               <a href="#" className="text-blue-600 hover:underline">

@@ -20,6 +20,9 @@ export const UploadModal = ({
   const { activeWorkspace, activeFolder } = useWorkspace();
   
   if (!isOpen) return null;
+  if(!activeWorkspace || !activeFolder) {
+    return;
+  }
 
   const handleFileUpload = async (files: FileList) => {
     // Array.from(files).forEach((file) => {
@@ -38,7 +41,7 @@ export const UploadModal = ({
 
      uploadsArray.forEach(async (uploads, index) => {
         try {
-          await FileServices.upload(activeWorkspace?.id, activeFolder?.id, files[index], (percent) => {
+          await FileServices.upload(activeWorkspace.id, activeFolder.id, files[index], (percent) => {
             setUploads(prev => {
               const copy = [...prev];
               copy[index] = { ...copy[index], progress: percent };
@@ -94,7 +97,7 @@ export const UploadModal = ({
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <X size={24} />
+             <X size={24} /> {/* close */}
           </button>
         </div>
 

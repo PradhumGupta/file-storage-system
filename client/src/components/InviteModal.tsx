@@ -33,32 +33,32 @@ interface props {
 }
 
 // Mock search results for invite modal
-const mockSearchResults = [
-  {
-    id: 101,
-    name: "Jessica Brown",
-    email: "jessica.brown@company.com",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-    department: "Product",
-  },
-  {
-    id: 102,
-    name: "Michael Davis",
-    email: "michael.davis@company.com",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    department: "Operations",
-  },
-  {
-    id: 103,
-    name: "Amanda Taylor",
-    email: "amanda.taylor@company.com",
-    avatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-    department: "HR",
-  },
-];
+// const mockSearchResults = [
+//   {
+//     id: 101,
+//     name: "Jessica Brown",
+//     email: "jessica.brown@company.com",
+//     avatar:
+//       "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+//     department: "Product",
+//   },
+//   {
+//     id: 102,
+//     name: "Michael Davis",
+//     email: "michael.davis@company.com",
+//     avatar:
+//       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+//     department: "Operations",
+//   },
+//   {
+//     id: 103,
+//     name: "Amanda Taylor",
+//     email: "amanda.taylor@company.com",
+//     avatar:
+//       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+//     department: "HR",
+//   },
+// ];
 
 interface User {
   id: string;
@@ -97,8 +97,8 @@ function InviteModal({
       else
         users = await WorkspaceServices.getMembers(activeWorkspace!.id, query);
       setSearchResults(users);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "An error occurred");
+    } catch (error) {
+      if(error instanceof Error) toast.error(error.message);
     } finally {
       setLoading(false);
     }

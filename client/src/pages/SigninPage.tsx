@@ -10,9 +10,9 @@ const SigninPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
-  const {login, user} = useAuth();
+  const { login, user } = useAuth();
   const [loading, setLoading] = useState(false);
 
   // Handles input changes
@@ -25,27 +25,29 @@ const SigninPage = () => {
   };
 
   // Handles form submission (simplified)
-  const handleSubmit =async (e: SubmitEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await AuthServices.login(formData.email, formData.password);
-      login(response?.user)
-      toast.success("logged in successfully")
+      const response = await AuthServices.login(
+        formData.email,
+        formData.password
+      );
+      login(response?.user);
+      toast.success("logged in successfully");
     } catch (error: unknown) {
-      if(error instanceof Error) toast.error(error.message)
+      if (error instanceof Error) toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if(user) {
+    if (user) {
       // const workspaceSlug = slugify(`${user.name} + 's Workspace`);
-      navigate(`/dashboard/personal`)
+      navigate(`/dashboard/personal`);
     }
-  }, [user])
-
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -67,7 +69,7 @@ const SigninPage = () => {
             <div className="space-y-4 w-full">
               <button className="flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors">
                 <img
-                  src="https://www.dropbox.com/static/images/empty_states/sign-in-google-icon@2x-vflMvB9fO.png"
+                  src="https://www.Zenith.com/static/images/empty_states/sign-in-google-icon@2x-vflMvB9fO.png"
                   alt="Google icon"
                   className="w-5 h-5"
                 />
@@ -75,7 +77,7 @@ const SigninPage = () => {
               </button>
               <button className="flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors">
                 <img
-                  src="https://www.dropbox.com/static/images/empty_states/sign-in-apple-icon@2x-vflhE3LhW.png"
+                  src="https://www.Zenith.com/static/images/empty_states/sign-in-apple-icon@2x-vflhE3LhW.png"
                   alt="Apple icon"
                   className="w-5 h-5"
                 />
@@ -100,32 +102,36 @@ const SigninPage = () => {
                 required
                 className="w-full px-4 py-3 my-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
               />
-              
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Password
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 my-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                
-              <button type="submit"
-              disabled={loading}
-              className="w-full py-3 my-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md cursor-pointer flex justify-center"
-            >
-              {loading ? <Spinner className="size-6 text-blue-200" /> : "Continue"}
-            </button>
-              </form>
-            </div>
 
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 my-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 my-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md cursor-pointer flex justify-center"
+              >
+                {loading ? (
+                  <Spinner className="size-6 text-blue-200" />
+                ) : (
+                  "Continue"
+                )}
+              </button>
+            </form>
           </div>
+        </div>
       </main>
     </div>
   );

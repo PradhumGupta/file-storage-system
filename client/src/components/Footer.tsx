@@ -1,46 +1,46 @@
-import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 
 const footerLinks = {
-  'Products': [
-    'Dropbox Basic',
-    'Dropbox Plus',
-    'Dropbox Family',
-    'Dropbox Professional',
-    'Dropbox Business',
-    'Enterprise'
+  Products: [
+    "Zenith Basic",
+    "Zenith Plus",
+    "Zenith Family",
+    "Zenith Professional",
+    "Zenith Business",
+    "Enterprise",
   ],
-  'Features': [
-    'File sharing',
-    'Cloud storage',
-    'Mobile apps',
-    'Integrations',
-    'File recovery',
-    'Password protect'
+  Features: [
+    "File sharing",
+    "Cloud storage",
+    "Mobile apps",
+    "Integrations",
+    "File recovery",
+    "Password protect",
   ],
-  'Support': [
-    'Help center',
-    'Contact us',
-    'Privacy & terms',
-    'Cookie policy',
-    'AI principles',
-    'Sitemap'
+  Support: [
+    "Help center",
+    "Contact us",
+    "Privacy & terms",
+    "Cookie policy",
+    "AI principles",
+    "Sitemap",
   ],
-  'Company': [
-    'About us',
-    'Jobs',
-    'Investor relations',
-    'ESG',
-    'Brand assets',
-    'Referrals'
-  ]
+  Company: [
+    "About us",
+    "Jobs",
+    "Investor relations",
+    "ESG",
+    "Brand assets",
+    "Referrals",
+  ],
 };
 
 const socialLinks = [
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: Facebook, href: '#', label: 'Facebook' },
-  { icon: Instagram, href: '#', label: 'Instagram' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { icon: Youtube, href: '#', label: 'YouTube' }
+  { icon: Twitter, href: "#", label: "Twitter" },
+  { icon: Facebook, href: "#", label: "Facebook" },
+  { icon: Instagram, href: "#", label: "Instagram" },
+  { icon: Linkedin, href: "#", label: "LinkedIn" },
+  { icon: Youtube, href: "#", label: "YouTube" },
 ];
 
 export default function Footer() {
@@ -54,10 +54,11 @@ export default function Footer() {
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
                 <div className="w-5 h-5 bg-white rounded-sm"></div>
               </div>
-              <span className="text-2xl font-bold">Dropbox</span>
+              <span className="text-2xl font-bold">Zenith</span>
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
-              Dropbox brings everything—traditional files, cloud content, and web shortcuts—together in one place.
+              Zenith brings everything—traditional files, cloud content, and web
+              shortcuts—together in one place.
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((social, index) => {
@@ -100,16 +101,17 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex flex-wrap items-center space-x-6 mb-4 md:mb-0">
-              <select className="bg-gray-800 text-white border border-gray-700 rounded px-3 py-2 text-sm">
+              <select
+                title="language-select"
+                className="bg-gray-800 text-white border border-gray-700 rounded px-3 py-2 text-sm"
+              >
                 <option>English (United States)</option>
                 <option>Español</option>
                 <option>Français</option>
                 <option>Deutsch</option>
               </select>
             </div>
-            <div className="text-sm text-gray-400">
-              © 2024 Dropbox, Inc. All rights reserved.
-            </div>
+            <div className="text-sm text-gray-400">© 2025 Zenith</div>
           </div>
         </div>
       </div>

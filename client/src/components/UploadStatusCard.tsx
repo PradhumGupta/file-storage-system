@@ -106,7 +106,7 @@ export function UploadStatusCard({ uploads, setUploads, setFiles }: props) {
                 onClick={() => handleCancelUpload(file.id)}
                 className="text-gray-400 hover:text-red-500 transition-colors"
               >
-                <X size={16} />
+                <X size={16} />  {/* close */}
               </button>
             )}
           </div>

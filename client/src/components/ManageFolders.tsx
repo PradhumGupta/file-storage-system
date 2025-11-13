@@ -70,7 +70,7 @@ function ManageFolders({ isModalOpen, setIsModalOpen, teams }: props) {
         );
         setSearchResults(folders);
       } catch (error) {
-        if(error instanceof Error) toast.error(error.response?.data?.message || error.message);
+        if(error instanceof Error) toast.error(error.message);
       } finally {
         setLoading(false);
       }
@@ -93,12 +93,12 @@ function ManageFolders({ isModalOpen, setIsModalOpen, teams }: props) {
     try {
       const folderIds = selectedFolders.map((folder) => folder.id);
       await TeamServices.assignFolder(
-        activeWorkspace?.id,
+        activeWorkspace!.id,
         selectedTeam,
         folderIds
       );
     } catch (error) {        
-      if(error instanceof Error) toast.error(error.response?.data?.message || error.message);
+      if(error instanceof Error) toast.error(error.message);
     }
 
     setIsModalOpen(false);

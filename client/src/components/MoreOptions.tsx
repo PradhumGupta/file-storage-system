@@ -29,30 +29,34 @@ interface props {
 export default function MoreOptions({ type, item }: props) {
   const { activeWorkspace } = useWorkspace();
 
+  if(!activeWorkspace) {
+    return;
+  }
+
   const handleEdit = () => {
     toast.success(`Editing`);
   };
 
   const handleDelete = async () => {
     if (type == "folder") {
-      FileServices.deleteFolder(activeWorkspace?.id, item.id)
+      FileServices.deleteFolder(activeWorkspace.id, item.id)
         .then((message) => toast.success(message))
         .catch(() => toast.error("An error occurred"));
     }
     toast.error(`Deleting`);
   };
 
-  const handleFileOpen = async () => {
-    const res = await FileServices.downloadFile(activeWorkspace?.id, item.id);
-    if (res.downloadUrl) {
-      window.open(res.downloadUrl, "_blank");
-    } else {
-      alert("Failed to generate download link");
-    }
-  };
+  // const handleFileOpen = async () => {
+  //   const res = await FileServices.downloadFile(activeWorkspace.id, item.id);
+  //   if (res.downloadUrl) {
+  //     window.open(res.downloadUrl, "_blank");
+  //   } else {
+  //     alert("Failed to generate download link");
+  //   }
+  // };
 
   const handleFileDownload = async () => {
-    const file = await FileServices.downloadFile(activeWorkspace?.id, item.id);
+    const file = await FileServices.downloadFile(activeWorkspace.id, item.id);
     if (file) {
       const url = window.URL.createObjectURL(new Blob([file]));
       const link = document.createElement("a");

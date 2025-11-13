@@ -1,4 +1,4 @@
-import { ChevronDown, Folder, HardDrive, ImageIcon, ServerIcon, Users } from "lucide-react";
+import { ChevronDown, Folder, HardDrive, ImageIcon, Users } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
 function Sidebar({ activeTab = 'All files' }: {activeTab: string}) {

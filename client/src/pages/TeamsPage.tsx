@@ -71,156 +71,156 @@ interface Member {
   lastActive: string;
   status: string;
 }
-const initialTeams = [
-  {
-    id: 1,
-    name: "Design Team",
-    description: "UI/UX Design and Brand Assets",
-    memberCount: 8,
-    createdAt: "2024-01-15",
-    color: "bg-purple-500",
-    members: [
-      {
-        id: 1,
-        name: "Sarah Chen",
-        email: "sarah.chen@company.com",
-        avatar:
-          "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-        role: "Admin",
-        department: "Design",
-        joinedAt: "2024-01-15",
-        lastActive: "2 hours ago",
-        status: "active",
-      },
-      {
-        id: 2,
-        name: "Mike Johnson",
-        email: "mike.johnson@company.com",
-        avatar:
-          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-        role: "Editor",
-        department: "Design",
-        joinedAt: "2024-01-20",
-        lastActive: "1 day ago",
-        status: "active",
-      },
-      {
-        id: 3,
-        name: "Emily Watson",
-        email: "emily.watson@company.com",
-        avatar:
-          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-        role: "Viewer",
-        department: "Design",
-        joinedAt: "2024-02-01",
-        lastActive: "3 days ago",
-        status: "inactive",
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Engineering",
-    description: "Frontend and Backend Development",
-    memberCount: 12,
-    createdAt: "2024-02-01",
-    color: "bg-blue-500",
-    members: [
-      {
-        id: 4,
-        name: "John Doe",
-        email: "john.doe@company.com",
-        avatar:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        role: "Admin",
-        department: "Engineering",
-        joinedAt: "2024-02-01",
-        lastActive: "1 hour ago",
-        status: "active",
-      },
-      {
-        id: 5,
-        name: "Alex Rodriguez",
-        email: "alex.rodriguez@company.com",
-        avatar:
-          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-        role: "Editor",
-        department: "Engineering",
-        joinedAt: "2024-02-05",
-        lastActive: "30 minutes ago",
-        status: "active",
-      },
-      {
-        id: 6,
-        name: "Lisa Park",
-        email: "lisa.park@company.com",
-        avatar:
-          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
-        role: "Editor",
-        department: "Engineering",
-        joinedAt: "2024-02-10",
-        lastActive: "2 hours ago",
-        status: "active",
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Marketing",
-    description: "Brand Strategy and Content Creation",
-    memberCount: 6,
-    createdAt: "2024-02-15",
-    color: "bg-green-500",
-    members: [
-      {
-        id: 7,
-        name: "David Kim",
-        email: "david.kim@company.com",
-        avatar:
-          "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
-        role: "Admin",
-        department: "Marketing",
-        joinedAt: "2024-02-15",
-        lastActive: "4 hours ago",
-        status: "active",
-      },
-      {
-        id: 8,
-        name: "Rachel Green",
-        email: "rachel.green@company.com",
-        avatar:
-          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-        role: "Editor",
-        department: "Marketing",
-        joinedAt: "2024-02-20",
-        lastActive: "1 day ago",
-        status: "active",
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: "Sales",
-    description: "Customer Relations and Business Development",
-    memberCount: 5,
-    createdAt: "2024-03-01",
-    color: "bg-orange-500",
-    members: [
-      {
-        id: 9,
-        name: "Tom Wilson",
-        email: "tom.wilson@company.com",
-        avatar:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        role: "Admin",
-        department: "Sales",
-        joinedAt: "2024-03-01",
-        lastActive: "6 hours ago",
-        status: "active",
-      },
-    ],
-  },
-];
+// const initialTeams = [
+//   {
+//     id: 1,
+//     name: "Design Team",
+//     description: "UI/UX Design and Brand Assets",
+//     memberCount: 8,
+//     createdAt: "2024-01-15",
+//     color: "bg-purple-500",
+//     members: [
+//       {
+//         id: 1,
+//         name: "Sarah Chen",
+//         email: "sarah.chen@company.com",
+//         avatar:
+//           "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+//         role: "Admin",
+//         department: "Design",
+//         joinedAt: "2024-01-15",
+//         lastActive: "2 hours ago",
+//         status: "active",
+//       },
+//       {
+//         id: 2,
+//         name: "Mike Johnson",
+//         email: "mike.johnson@company.com",
+//         avatar:
+//           "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+//         role: "Editor",
+//         department: "Design",
+//         joinedAt: "2024-01-20",
+//         lastActive: "1 day ago",
+//         status: "active",
+//       },
+//       {
+//         id: 3,
+//         name: "Emily Watson",
+//         email: "emily.watson@company.com",
+//         avatar:
+//           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+//         role: "Viewer",
+//         department: "Design",
+//         joinedAt: "2024-02-01",
+//         lastActive: "3 days ago",
+//         status: "inactive",
+//       },
+//     ],
+//   },
+//   {
+//     id: 2,
+//     name: "Engineering",
+//     description: "Frontend and Backend Development",
+//     memberCount: 12,
+//     createdAt: "2024-02-01",
+//     color: "bg-blue-500",
+//     members: [
+//       {
+//         id: 4,
+//         name: "John Doe",
+//         email: "john.doe@company.com",
+//         avatar:
+//           "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+//         role: "Admin",
+//         department: "Engineering",
+//         joinedAt: "2024-02-01",
+//         lastActive: "1 hour ago",
+//         status: "active",
+//       },
+//       {
+//         id: 5,
+//         name: "Alex Rodriguez",
+//         email: "alex.rodriguez@company.com",
+//         avatar:
+//           "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+//         role: "Editor",
+//         department: "Engineering",
+//         joinedAt: "2024-02-05",
+//         lastActive: "30 minutes ago",
+//         status: "active",
+//       },
+//       {
+//         id: 6,
+//         name: "Lisa Park",
+//         email: "lisa.park@company.com",
+//         avatar:
+//           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+//         role: "Editor",
+//         department: "Engineering",
+//         joinedAt: "2024-02-10",
+//         lastActive: "2 hours ago",
+//         status: "active",
+//       },
+//     ],
+//   },
+//   {
+//     id: 3,
+//     name: "Marketing",
+//     description: "Brand Strategy and Content Creation",
+//     memberCount: 6,
+//     createdAt: "2024-02-15",
+//     color: "bg-green-500",
+//     members: [
+//       {
+//         id: 7,
+//         name: "David Kim",
+//         email: "david.kim@company.com",
+//         avatar:
+//           "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
+//         role: "Admin",
+//         department: "Marketing",
+//         joinedAt: "2024-02-15",
+//         lastActive: "4 hours ago",
+//         status: "active",
+//       },
+//       {
+//         id: 8,
+//         name: "Rachel Green",
+//         email: "rachel.green@company.com",
+//         avatar:
+//           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+//         role: "Editor",
+//         department: "Marketing",
+//         joinedAt: "2024-02-20",
+//         lastActive: "1 day ago",
+//         status: "active",
+//       },
+//     ],
+//   },
+//   {
+//     id: 4,
+//     name: "Sales",
+//     description: "Customer Relations and Business Development",
+//     memberCount: 5,
+//     createdAt: "2024-03-01",
+//     color: "bg-orange-500",
+//     members: [
+//       {
+//         id: 9,
+//         name: "Tom Wilson",
+//         email: "tom.wilson@company.com",
+//         avatar:
+//           "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+//         role: "Admin",
+//         department: "Sales",
+//         joinedAt: "2024-03-01",
+//         lastActive: "6 hours ago",
+//         status: "active",
+//       },
+//     ],
+//   },
+// ];
 
 export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -268,10 +268,10 @@ export default function TeamsPage() {
         activeWorkspace.id,
         teamId
       );
-      team.members = team.members.map((member) => ({
+      team.members = team.members.map((member:  { role: string, createdAt: string, user: { name: string, email: string } }) => ({
         name: member.user.name,
         email: member.user.email,
-        joinedAt: member.createdAt,
+        joinedAt: member.createdAt.split('T')[0],
         role: member.role
       }));
 
