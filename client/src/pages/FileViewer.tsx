@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import FileServices from "@/services/files.api";
