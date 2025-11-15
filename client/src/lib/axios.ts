@@ -2,10 +2,11 @@ import axios from "axios";
 import { AuthServices } from "../services/auth.api";
 
 const api = axios.create({
-    // baseURL: import.meta.env.MODE === "development" ? "/api" : "http://localhost:8080/api",
     baseURL: import.meta.env.PROD ? import.meta.env.SERVER_URL : "http://localhost:8080/api",
     withCredentials: true
 });
+
+console.log("api" ,api, "\n", import.meta.env.BASE_URL, "\n", import.meta.env.SERVER_URL)
 
 
 let refreshPromise: Promise<void> | null = null;
