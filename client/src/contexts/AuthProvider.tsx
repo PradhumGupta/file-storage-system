@@ -33,7 +33,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, fetchUser, logout }}>
-      {loaded ? children : <div>Loading...</div>}
+      {loaded ? children : (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+        </div>
+      )}
     </AuthContext.Provider>
   );
 };
