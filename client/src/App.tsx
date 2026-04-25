@@ -10,11 +10,17 @@ import MembersPage from "./pages/MembersPage"
 import FileViewer from "./pages/FileViewer"
 import WorkspaceProvider from "./contexts/WorkspaceProvider"
 
-// ✅ Protect routes — only authenticated users can access
 const PrivateRoute = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
-  // if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+  
   if (!user) return <Navigate to="/login" replace />;
 
   return <Outlet />;

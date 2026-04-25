@@ -13,6 +13,7 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  loading: boolean;
   fetchUser: () => Promise<void>;
   login: (userData: User) => void
   logout: () => Promise<void>;
