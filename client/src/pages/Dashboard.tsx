@@ -1,5 +1,4 @@
 import {
-  Search,
   Grid,
   List,
   ChevronDown,
@@ -14,8 +13,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Sidebar from "../layouts/Sidebar";
-import WorkspaceSelector from "@/components/WorkspaceSelector";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import type { File, Folder } from "@/contexts/WorkspaceContext";
@@ -24,13 +21,12 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { Button } from "@/components/ui/button";
 import FileServices from "@/services/files.api";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import CreateFolderForm from "@/components/CreateFolderForm";
 import MoreOptions from "@/components/MoreOptions";
 import { UploadModal } from "@/components/UploadModal";
 import { UploadStatusCard } from "@/components/UploadStatusCard";
 import { Spinner } from "@/components/ui/spinner";
-import { useAuth } from "@/hooks/useAuth";
 
 export interface Upload {
   id: string;
@@ -46,13 +42,11 @@ const Dashboard = () => {
   const [files, setFiles] = useState<File[]>([]);
 
   const { activeWorkspace, setFolder, loading } = useWorkspace();
-  const { user } = useAuth();
 
   const { workspaceName, folderId } = useParams(); // from route :workspaceName
   const navigate = useNavigate();
-  const [typeFilter, setTypeFilter] = useState("Type");
-  const [peopleFilter, setPeopleFilter] = useState("People");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [sortBy, setSortBy] = useState("Name");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [path, setPath] = useState<{ id: string; name: string }[]>([]);
   const [openForm, setOpenForm] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -85,313 +79,236 @@ const Dashboard = () => {
     showData();
   }, [activeWorkspace, folderId]);
 
+  const filteredFolders = folders.sort((a, b) => {
+    if (sortBy === "Name") return a.name.localeCompare(b.name);
+    return 0; // Default or fallback
+  });
+
+  const filteredFiles = files.sort((a, b) => {
+    if (sortBy === "Name") return a.filename.localeCompare(b.filename);
+    if (sortBy === "Modified") return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    return 0;
+  });
+
+  const totalItems = filteredFolders.length + filteredFiles.length;
+
   return (
-    <div className="flex bg-gray-100 h-screen p-4 font-sans">
-      {/* Container with a subtle shadow and rounded corners */}
-      <div
-        className={
-          "relative flex flex-1 bg-white rounded-[40px] shadow-lg overflow-hidden" +
-          `${loading ? "opacity-100 pointer-events-none" : ""}`
-        }
-      >
-        {/* Sidebar */}
-        <Sidebar activeTab="All files" />
+    <div className={`relative flex flex-col flex-1 h-full min-h-0 ${loading ? "opacity-50 pointer-events-none" : ""}`}>
 
-        {/* Main Content Area */}
-        <main className="flex-1 flex flex-col p-10">
-          {/* Top Search and User Bar */}
-          <header className="flex items-center justify-between mb-8">
-            {/* Search Bar */}
-            <div className="relative flex-1 mr-8">
-              <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-              <input
-                type="text"
-                placeholder="Search"
-                className="w-4/7 pl-12 pr-4 py-3 rounded-2xl bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-md"
-              />
-            </div>
-            {/* Right Icons */}
-            <div className="flex items-center gap-4 text-gray-500">
-              <WorkspaceSelector />
-              <button className="flex items-center gap-2 p-2 rounded-xl text-gray-700 font-medium hover:bg-gray-200 transition-colors duration-200">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={user?.avatar} alt={user?.name} />
-                  <AvatarFallback>
-                    {user?.name.split(" ").map((n) => n[0]).join("")}
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            </div>
-          </header>
+      {/* Breadcrumbs */}
+      <div className="mb-6">
+        <Breadcrumbs path={path} />
+      </div>
 
-          {/* Breadcrumbs */}
-          <div className="mb-6">
-            <Breadcrumbs path={path} />
+      {/* Results Header and Filters */}
+      <div className="flex flex-col">
+        <h2 className="text-gray-800 text-2xl font-bold mb-4">
+          {totalItems} items
+        </h2>
+        {/* Filters */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center space-x-2">
+                  <span>Sort by {sortBy}</span>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSortBy("Name")}>Sort by Name</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("Size")}>Sort by Size</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("Modified")}>Sort by Modified</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
-          {/* Results Header and Filters */}
-          <div className="flex flex-col">
-            <h2 className="text-gray-800 text-2xl font-bold mb-2">
-              215+ results
-            </h2>
-            {/* Filters */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-4">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="flex items-center space-x-2"
-                    >
-                      <span>{typeFilter}</span>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() => setTypeFilter("All types")}
-                    >
-                      All types
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTypeFilter("Images")}>
-                      Images
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setTypeFilter("Documents")}
-                    >
-                      Documents
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTypeFilter("Videos")}>
-                      Videos
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="flex items-center space-x-2"
-                    >
-                      <span>{peopleFilter}</span>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => setPeopleFilter("Anyone")}>
-                      Anyone
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setPeopleFilter("Only me")}
-                    >
-                      Only me
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setPeopleFilter("Shared with me")}
-                    >
-                      Shared with me
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <div className="flex border rounded-lg">
-                  <Button
-                    variant={viewMode === "grid" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setViewMode("grid")}
-                    className="rounded-r-none"
-                  >
-                    <Grid className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === "list" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setViewMode("list")}
-                    className="rounded-l-none"
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="default"
-                      className="flex items-center space-x-2"
-                    >
-                      <FilePlus className="h-4 w-4" />
-                      <span>Add</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => setOpenForm(true)}>
-                      Folder
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <div
-                        className="flex justify-center gap-2"
-                        onClick={() => setIsModalOpen(true)}
-                      >
-                        <UploadCloudIcon size={20} />
-                        <span>Upload</span>
-                      </div>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+          <div className="flex items-center space-x-6">
+            <div className="flex border rounded-lg overflow-hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewMode("grid")}
+                className={`rounded-none hover:text-gray-600 ${viewMode === "grid" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-500"}`}
+              >
+                <Grid className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className={`rounded-none hover:text-gray-600 ${viewMode === "list" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-500"}`}
+              >
+                <List className="h-4 w-4" />
+              </Button>
             </div>
 
-            <CreateFolderForm
-              openForm={openForm}
-              setOpenForm={setOpenForm}
-              setFolders={setFolders}
-            />
-
-            {/* Relevance indicator */}
-            <div className="mb-6">
-              <span className="text-sm text-gray-500">Relevance</span>
-            </div>
-          </div>
-
-          {viewMode === "grid" ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 overflow-y-auto">
-              {folders.length > 0 &&
-                folders.map((folder) => (
-                  <div
-                    key={folder.id}
-                    className="bg-gray-50 p-4 rounded-xl shadow-md cursor-pointer hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
-                    onClick={() =>
-                      navigate(
-                        `/dashboard/${workspaceName}/folder/${folder.id}`
-                      )
-                    }
-                  >
-                    <div className="relative">
-                      <div className="w-full h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-3">
-                        <FolderIcon className="h-12 w-12 text-blue-400" />
-
-                        <div className="absolute right-3 top-3">
-                          <MoreOptions type="folder" item={folder} />
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-700 font-medium">
-                      {folder.name}
-                    </p>
-                  </div>
-                ))}
-              {files.length > 0 &&
-                files.map((file) => (
-                  <div
-                    key={file.id}
-                    className="bg-gray-50 p-4 rounded-xl shadow-md cursor-pointer hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
-                    onClick={() =>
-                      activeWorkspace &&
-                      FileServices.showFolder(activeWorkspace.id, file.id)
-                    }
-                  >
-                    <div className="relative">
-                      <div className="w-full h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center mb-3">
-                        <div className="text-2xl">
-                          📄
-                          <div className="absolute right-3 top-3">
-                            <MoreOptions type="file" item={file} />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-700 font-medium">
-                      {file.filename}
-                    </p>
-                  </div>
-                ))}
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {/* Folders in list view */}
-              {folders.map((folder) => (
-                <div
-                  key={folder.id}
-                  className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer"
-                  onClick={() =>
-                    navigate(`/dashboard/${workspaceName}/folder/${folder.id}`)
-                  }
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="py-2 px-4 rounded-lg flex items-center"
+                  onClick={() => setIsModalOpen(true)}
                 >
-                  <FolderIcon className="h-8 w-8 text-blue-600" />
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">{folder.name}</p>
-                    <p className="text-sm text-gray-500">Folder</p>
+                  <UploadCloudIcon className="h-4 w-4" /> Upload
+                </Button>
+                <Button
+                  className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center"
+                  onClick={() => setOpenForm(true)}
+                >
+                  <FilePlus className="h-4 w-4" /> Create
+                </Button>
+              </div>
+          </div>
+        </div>
+
+        <CreateFolderForm
+          openForm={openForm}
+          setOpenForm={setOpenForm}
+          setFolders={setFolders}
+        />
+      </div>
+
+      {viewMode === "grid" ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 overflow-y-auto pb-6 min-h-0">
+          {filteredFolders.length > 0 &&
+            filteredFolders.map((folder) => (
+              <div
+                key={folder.id}
+                className="bg-gray-50 p-4 rounded-xl shadow-md cursor-pointer hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+                onClick={() =>
+                  navigate(
+                    `/dashboard/${workspaceName}/folder/${folder.id}`
+                  )
+                }
+              >
+                <div className="relative">
+                  <div className="w-full h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-3">
+                    <FolderIcon className="h-12 w-12 text-blue-400" />
+
+                    <div className="absolute right-3 top-3">
+                      <MoreOptions type="folder" item={folder} />
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-500">—</div>
-                  <div className="text-sm text-gray-500">—</div>
+                </div>
+                <p className="text-sm text-gray-700 font-medium">
+                  {folder.name}
+                </p>
+              </div>
+            ))}
+          {filteredFiles.length > 0 &&
+            filteredFiles.map((file) => (
+              <div
+                key={file.id}
+                className="bg-gray-50 p-4 rounded-xl shadow-md cursor-pointer hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+                onClick={() =>
+                  activeWorkspace &&
+                  FileServices.showFolder(activeWorkspace.id, file.id)
+                }
+              >
+                <div className="relative">
+                  <div className="w-full h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center mb-3">
+                    <div className="text-2xl">
+                      📄
+                      <div className="absolute right-3 top-3">
+                        <MoreOptions type="file" item={file} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 font-medium">
+                  {file.filename}
+                </p>
+              </div>
+            ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden min-h-0">
+          <div className="grid grid-cols-12 gap-4 p-4 border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider shrink-0">
+            <div className="col-span-6 md:col-span-5">Name</div>
+            <div className="col-span-3 hidden md:block">Owner</div>
+            <div className="col-span-3">Modified</div>
+            <div className="col-span-3 md:col-span-1 text-right">Actions</div>
+          </div>
+          <div className="divide-y divide-gray-50 overflow-y-auto min-h-0">
+            {/* Folders in list view */}
+            {filteredFolders.map((folder) => (
+              <div
+                key={folder.id}
+                className="grid grid-cols-12 gap-4 p-4 hover:bg-gray-50 items-center transition-colors duration-150 cursor-pointer"
+                onClick={() =>
+                  navigate(`/dashboard/${workspaceName}/folder/${folder.id}`)
+                }
+              >
+                <div className="col-span-6 md:col-span-5 flex items-center gap-3">
+                  <FolderIcon className="h-6 w-6 text-blue-500 fill-blue-100" />
+                  <span className="font-medium text-gray-800 line-clamp-1">{folder.name}</span>
+                </div>
+                <div className="col-span-3 hidden md:block text-sm text-gray-500">—</div>
+                <div className="col-span-3 text-sm text-gray-500">—</div>
+                <div className="col-span-3 md:col-span-1 flex justify-end">
                   <MoreOptions type="folder" item={folder} />
                 </div>
-              ))}
+              </div>
+            ))}
 
-              {/* Files in list view */}
-              {files.map((file) => (
-                <div
-                  key={file.id}
-                  className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer"
-                >
-                  <div className="w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded flex items-center justify-center">
-                    <span className="text-sm">📄</span>
+            {/* Files in list view */}
+            {filteredFiles.map((file) => (
+              <div
+                key={file.id}
+                className="grid grid-cols-12 gap-4 p-4 hover:bg-gray-50 items-center transition-colors duration-150 cursor-pointer"
+                onClick={() =>
+                  activeWorkspace &&
+                  FileServices.showFolder(activeWorkspace.id, file.id)
+                }
+              >
+                <div className="col-span-6 md:col-span-5 flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-500">
+                    📄
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">{file.filename}</p>
-                    <p className="text-sm text-gray-500">{file.type}</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
+                  <span className="font-medium text-gray-800 line-clamp-1">{file.filename}</span>
+                </div>
+                <div className="col-span-3 hidden md:block">
+                  <div className="flex items-center gap-2">
                     <Avatar className="w-6 h-6">
-                      {/* <AvatarImage
-                        src={file.uploadedBy}
-                        alt={file.uploadedBy}
-                      /> */}
-                      <AvatarFallback className="text-xs">
-                        {file.uploader.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                      <AvatarFallback className="text-[10px] bg-purple-100 text-purple-700">
+                        {file.uploader?.name?.split(" ").map((n) => n[0]).join("") || "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm text-gray-600">
-                      {file.uploadedBy}
+                    <span className="text-sm text-gray-600 line-clamp-1">
+                      {file.uploadedBy || file.uploader?.name}
                     </span>
                   </div>
-                  <div className="text-sm text-gray-500 min-w-20">
-                    {file.updatedAt}
-                  </div>
-                  <Share className="h-4 w-4" />
+                </div>
+                <div className="col-span-3 text-sm text-gray-500 whitespace-nowrap">
+                  {new Date(file.updatedAt).toLocaleDateString()}
+                </div>
+                <div className="col-span-3 md:col-span-1 flex justify-end gap-2 items-center">
+                  <Share className="h-4 w-4 text-gray-400 hover:text-blue-500 transition-colors" />
                   <MoreOptions type="file" item={file} />
                 </div>
-              ))}
-            </div>
-          )}
-        </main>
-        {/* Renders the Upload Modal */}
-        <UploadModal
-          setUploads={setUploads}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-
-        {/* Renders the Upload Status Card */}
-        <UploadStatusCard
-          uploads={uploads}
-          setUploads={setUploads}
-          setFiles={setFiles}
-        />
-        {loading && (
-          <div className="flex justify-center items-center gap-2 absolute inset-0">
-            <Spinner className="size-8 text-blue-200" />
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+      {/* Renders the Upload Modal */}
+      <UploadModal
+        setUploads={setUploads}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+
+      {/* Renders the Upload Status Card */}
+      <UploadStatusCard
+        uploads={uploads}
+        setUploads={setUploads}
+        setFiles={setFiles}
+      />
+      {loading && (
+        <div className="flex justify-center items-center gap-2 absolute inset-0">
+          <Spinner className="size-8 text-blue-200" />
+        </div>
+      )}
     </div>
   );
 };

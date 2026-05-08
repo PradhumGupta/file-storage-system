@@ -30,11 +30,8 @@ import WorkspaceServices from "@/services/workspace.api";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import toast from "react-hot-toast";
 import { type User } from "@/contexts/AuthContext";
-import Sidebar from "@/layouts/Sidebar";
-import WorkspaceSelector from "@/components/WorkspaceSelector";
 import InviteModal from "@/components/InviteModal";
 import { Spinner } from "@/components/ui/spinner";
-import { useAuth } from "@/hooks/useAuth";
 
 interface Member extends User {
   avatar: string;
@@ -51,8 +48,6 @@ function MembersPage() {
   const [loading, setLoading] = useState(false);
 
   const { activeWorkspace, role } = useWorkspace();
-  const { user } = useAuth();
-  console.log(role)
 
   const filteredMembers = members.filter(
     (member) =>
@@ -118,31 +113,11 @@ function MembersPage() {
   }, []);
 
   return (
-    <div className="flex bg-gray-100 min-h-screen p-4 font-sans">
+    <div className={`relative flex flex-col flex-1 h-full min-h-0 ${loading ? "opacity-50 pointer-events-none" : ""}`}>
       {/* Header */}
-      <div className="flex flex-1 bg-white rounded-[40px] shadow-lg overflow-hidden">
-        {/* Sidebar */}
-        <Sidebar activeTab="Members" />
-
-        {/* Main Content Area */}
-        <main className="relative flex-1 flex flex-col p-10">
-          {/* Top Search and User Bar */}
-          <header className="flex items-center justify-between mb-8">
-            {/* Search Bar */}
-            <div className="mr-8">
-              <h2 className="text-2xl font-semibold text-gray-900">Members</h2>
-            </div>
-            {/* Right Icons */}
-            <div className="flex items-center gap-4 text-gray-500">
-              <WorkspaceSelector />
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={user?.avatar} alt={user?.name} />
-                <AvatarFallback>
-                  {user?.name.split(" ").map((n) => n[0]).join("")}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-          </header>
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-gray-900">Members</h2>
+      </div>
 
           <div className="mb-6 flex justify-between">
             <div className="relative max-w-md">
@@ -155,9 +130,8 @@ function MembersPage() {
               />
             </div>
             <div className="flex">
-              <Button onClick={() => setIsInviteModalOpen(true)}>
-                {" "}
-                <Plus size={10} /> <span>Invite</span>
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2" onClick={() => setIsInviteModalOpen(true)}>
+                 <Plus size={10} /> Invite
               </Button>
             </div>
           </div>
@@ -168,14 +142,14 @@ function MembersPage() {
               <Spinner className="size-8 text-gray-800" />
             </div>
           ) : (
-            <div className="bg-white rounded-lg border border-gray-200 flex-shrink-0">
-              <div className="px-6 py-4 border-b border-gray-200">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col flex-1 min-h-0">
+            <div className="p-6 border-b border-gray-200 shrink-0">
                 <h2 className="text-lg font-semibold text-gray-900">
                   Workspace Members ({filteredMembers.length})
                 </h2>
               </div>
 
-              <div className="divide-y divide-gray-200 overflow-y-auto">
+              <div className="divide-y divide-gray-200 overflow-y-auto min-h-0">
                 {filteredMembers.map((member) => {
                   return (
                     <div key={member.id} className="px-6 py-4 hover:bg-gray-50">
@@ -288,8 +262,6 @@ function MembersPage() {
             isInviteModalOpen={isInviteModalOpen}
             setIsInviteModalOpen={setIsInviteModalOpen}
           />
-        </main>
-      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 
 export default function Footer() {
   return (
-    <footer className="bg-white py-12 border-t border-slate-200">
+    <footer className="bg-white py-6 border-t border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
           <div className="flex items-center">
@@ -32,7 +32,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-4 pt-4 border-t border-slate-100 flex items-center text-sm text-slate-400">
-          <p>&copy; {new Date().getFullYear()} Zenith. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} <span className="font-semibold text-slate-900">Zenith</span> — All rights reserved.</p>
         </div>
       </div>
     </footer>

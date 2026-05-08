@@ -1,28 +1,20 @@
-import { ChevronDown, Folder, HardDrive, ImageIcon, Users } from "lucide-react";
+import { Folder, HardDrive, Users, Menu, Clock, Star } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useWorkspace } from "@/hooks/useWorkspace";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
-function Sidebar({ activeTab = 'All files' }: {activeTab: string}) {
+export default function Sidebar({ activeTab = 'All files' }: { activeTab?: string }) {
   const { workspaceName } = useParams();
-    const sidebarNavItems = [
-    { name: 'All files', icon: <HardDrive size={18} />, link: `/dashboard/${workspaceName}` },
-    { name: 'Photos', icon: <ImageIcon size={18} />, link: "" },
-    {name: 'Teams', icon: <Users size={18} />, link: `/dashboard/${workspaceName}/teams`},
-    {name: 'Members', icon: <Users size={18} />, link: `/dashboard/${workspaceName}/members`},
-  ];
+  const { activeWorkspace, activeFolder } = useWorkspace();
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
+  const isPersonal = workspaceName === "personal";
 
-  const folders = [
-    'Design',
-    'Sales Collateral',
-    'Remodels',
-    'Taxes',
-  ];
-
-  return (
-    <aside className="w-1/5 min-w-30 max-w-300 h-screen bg-gray-50 flex-shrink-0 p-8 border-r border-gray-200 flex flex-col">
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full bg-gray-50">
       {/* Top of Sidebar */}
-      <div className="mb-10 flex items-center gap-2">
+      <div className="mb-10 flex items-center gap-2 px-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="40"
@@ -37,56 +29,127 @@ function Sidebar({ activeTab = 'All files' }: {activeTab: string}) {
           />
           <circle cx="300" cy="80" r="35" fill="#000000" />
         </svg>
+        <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Zenith</h1>
+      </div>
 
-        <h1 className="text-2xl font-bold text-gray-800">Zenith</h1>
-      </div>
-      {/* Main Navigation */}
-      <nav className="space-y-4 mb-8">
-        {sidebarNavItems.map((item, index) =>
-          workspaceName === "personal" &&
-          (item.name === "Members" || item.name === "Teams") ? (
-            <></>
-          ) : (
-            <div
-              key={index}
-              className={`flex items-center gap-4 p-3 rounded-xl transition-colors duration-200 cursor-pointer
-                  ${
-                    item.name === activeTab
-                      ? "bg-gray-200 text-black"
-                      : "text-gray-600 hover:bg-gray-100"
+      <div className="flex-1 overflow-y-auto pr-2 space-y-6">
+        {/* Quick Access */}
+        <div>
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-2">
+            Quick Access
+          </h3>
+          <nav className="space-y-1">
+            <button
+              onClick={() => navigate(`/dashboard/${workspaceName}`)}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === "All files"
+                ? "bg-blue-100 text-blue-700 font-medium"
+                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+            >
+              <HardDrive size={18} className={activeTab === "All files" ? "text-blue-600" : "text-gray-500"} />
+              All files
+            </button>
+            <button
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+            >
+              <Clock size={18} className="text-gray-500" />
+              Recent
+            </button>
+            <button
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+            >
+              <Star size={18} className="text-gray-500" />
+              Starred
+            </button>
+          </nav>
+        </div>
+
+        {/* Folders */}
+        <div>
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-2">
+            Folders
+          </h3>
+          <div className="space-y-1">
+            {activeWorkspace?.folders?.length === 0 ? (
+              <p className="text-sm text-gray-500 px-2">No folders</p>
+            ) : (
+              activeWorkspace?.folders?.map((folder) => (
+                <div key={folder.id}>
+                  <button
+                    onClick={() => navigate(`/dashboard/${workspaceName}/folder/${folder.id}`)}
+                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 ${activeFolder?.id === folder.id
+                      ? "bg-blue-100 text-blue-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
+                  >
+                    <Folder
+                      size={18}
+                      className={activeFolder?.id === folder.id ? "text-blue-600" : "text-gray-400"}
+                      fill={activeFolder?.id === folder.id ? "currentColor" : "none"}
+                    />
+                    <span className="truncate">{folder.name}</span>
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Teams (Hidden for personal) */}
+        {!isPersonal && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-2">
+              Teams
+            </h3>
+            <nav className="space-y-1">
+              <button
+                onClick={() => navigate(`/dashboard/${workspaceName}/teams`)}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === "Teams"
+                  ? "bg-blue-100 text-blue-700 font-medium"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`}
-              onClick={() => {
-                if (item.name !== activeTab) navigate(item.link);
-              }}
-            >
-              {item.icon}
-              <span className="font-medium">{item.name}</span>
-            </div>
-          )
+              >
+                <Users size={18} className={activeTab === "Teams" ? "text-blue-600" : "text-gray-500"} />
+                Teams
+              </button>
+              <button
+                onClick={() => navigate(`/dashboard/${workspaceName}/members`)}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === "Members"
+                  ? "bg-blue-100 text-blue-700 font-medium"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+              >
+                <Users size={18} className={activeTab === "Members" ? "text-blue-600" : "text-gray-500"} />
+                Members
+              </button>
+            </nav>
+          </div>
         )}
-      </nav>
-      {/* Folders Section */}
-      <div className="flex flex-col flex-grow">
-        <div className="flex items-center justify-between mb-4 text-gray-500">
-          <span className="text-sm font-semibold uppercase">Folders</span>
-          <span className="text-sm hover:text-gray-700 transition-colors duration-200">
-            <ChevronDown size={18} />
-          </span>
-        </div>
-        <div className="space-y-2 overflow-y-auto">
-          {folders.map((folder, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-2 p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
-            >
-              <Folder size={20} className="text-gray-400" />
-              <span>{folder}</span>
-            </div>
-          ))}
-        </div>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Mobile Sidebar */}
+      <div className="md:hidden flex items-center p-4 bg-white border-b border-gray-200 sticky top-0 z-20">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="-ml-2">
+              <Menu size={24} />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-72 p-6">
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
+        <span className="ml-2 font-bold text-lg text-gray-800">Zenith</span>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-64 lg:w-72 h-full bg-gray-50 flex-shrink-0 p-6 border-r border-gray-200 flex-col transition-all duration-300">
+        <SidebarContent />
+      </aside>
+    </>
   );
 }
-
-export default Sidebar

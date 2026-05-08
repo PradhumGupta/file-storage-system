@@ -24,4 +24,9 @@ export class AuthServices {
         const response = await api.post('/auth/refresh')
         return response.data;
     }
+
+    public static verifyToken = async (idToken: string) => {
+        const response = await api.post('/auth/google', {idToken})
+        return response.data;
+    }
 }

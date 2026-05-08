@@ -9,6 +9,7 @@ import TeamsPage from "./pages/TeamsPage"
 import MembersPage from "./pages/MembersPage"
 import FileViewer from "./pages/FileViewer"
 import WorkspaceProvider from "./contexts/WorkspaceProvider"
+import DashboardLayout from "./layouts/DashboardLayout"
 
 const PrivateRoute = () => {
   const { user, loading } = useAuth();
@@ -47,11 +48,13 @@ function App() {
         {/* Protected Routes */}
             <Route path="dashboard" element={<PrivateRoute />}>
               <Route path=":workspaceName" element={<WorkspaceBoundary />}>
-                <Route index element={<Dashboard />} />
-                <Route path="folder/:folderId" element={<Dashboard />} />
-                <Route path="members" element={<MembersPage />} />
-                <Route path="teams" element={<TeamsPage />} />
-                <Route path="file/:fileId" element={<FileViewer />} />
+                <Route element={<DashboardLayout />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="folder/:folderId" element={<Dashboard />} />
+                  <Route path="members" element={<MembersPage />} />
+                  <Route path="teams" element={<TeamsPage />} />
+                  <Route path="file/:fileId" element={<FileViewer />} />
+                </Route>
               </Route>
             </Route>
 

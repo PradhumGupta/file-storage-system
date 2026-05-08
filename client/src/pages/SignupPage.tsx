@@ -5,8 +5,11 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
 import { AuthServices } from "@/services/auth.api";
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
+import { useAuth } from "@/hooks/useAuth";
 
 const SignupPage = () => {
+  const { login } = useAuth();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     email: "",
@@ -49,11 +52,26 @@ const SignupPage = () => {
       setStep((prevStep) => prevStep + 1);
     } catch (error) {
       if (error instanceof Error) toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleBack = () => {
     setStep((prevStep) => prevStep - 1);
+  };
+
+  const handleSuccess = async (credentialResponse: CredentialResponse) => {
+    if(!credentialResponse.credential) {
+      return;
+    }
+    try {
+      const response = await AuthServices.verifyToken(credentialResponse.credential)
+      login(response?.user);
+      toast.success("Account created successfully");
+    } catch (error: unknown) {
+      if (error instanceof Error) toast.error("Google authentication failed: " + error.message);
+    }
   };
 
   const renderStep = () => {
@@ -69,23 +87,15 @@ const SignupPage = () => {
               <span className="font-semibold text-gray-700">work email</span>.
             </p>
 
-            <div className="space-y-4 w-full">
-              <button className="flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors">
-                <img
-                  src="https://www.Zenith.com/static/images/empty_states/sign-in-google-icon@2x-vflMvB9fO.png"
-                  alt="Google icon"
-                  className="w-5 h-5"
-                />
-                <span>Continue with Google</span>
-              </button>
-              <button className="flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors">
-                <img
-                  src="https://www.Zenith.com/static/images/empty_states/sign-in-apple-icon@2x-vflhE3LhW.png"
-                  alt="Apple icon"
-                  className="w-5 h-5"
-                />
-                <span>Continue with Apple</span>
-              </button>
+            <div className="space-y-4 w-full flex justify-center">
+              <GoogleLogin
+                onSuccess={handleSuccess}
+                onError={() => console.log("Login Failed")}
+                useOneTap 
+                theme="filled_blue"
+                shape="rectangular"
+                text="signup_with"
+              />
             </div>
 
             <div className="my-6 text-gray-400">or</div>
