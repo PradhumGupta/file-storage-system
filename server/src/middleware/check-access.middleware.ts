@@ -2,7 +2,6 @@ import prisma from "../config/prisma";
 import { permissions } from "../config/permissions";
 import { Response, NextFunction } from "express";
 import { AuthRequest } from "./auth.middleware";
-import { ForbiddenError } from "../utils/errors";
 import { TeamRole, WorkspaceRole } from "@prisma/client";
 
 export const checkAccess = (resource: string, action: string) => {
@@ -29,21 +28,31 @@ export const checkAccess = (resource: string, action: string) => {
         break;
 
       case "folder":
-        resourceData = await prisma.folder.findFirst({
-          where: { id: req.params.folderId },
-          include: {
-            workspace: { include: { memberships: true } },
-            team: { include: { members: true } },
-          },
-        });
-        const workspaceMember = resourceData?.workspace?.memberships.find(
-          (m) => m.userId === userId
-        );
-        const teamMember = resourceData?.team?.members.find(
-          (m) => m.userId === userId
-        );
-        userRole = teamMember?.role || workspaceMember?.role;
-        // if(resourceData?.teamId && !teamMember) return res.status(403).json({ error: "Access denied" });
+        const targetFolderId = req.params.folderId || (action === "create" ? req.body.parentId : null);
+
+        if (targetFolderId) {
+          resourceData = await prisma.folder.findFirst({
+            where: { id: targetFolderId },
+            include: {
+              workspace: { include: { memberships: true } },
+              team: { include: { members: true } },
+            },
+          });
+          const workspaceMember = resourceData?.workspace?.memberships.find(
+            (m) => m.userId === userId
+          );
+          const teamMember = resourceData?.team?.members.find(
+            (m) => m.userId === userId
+          );
+          userRole = teamMember?.role || workspaceMember?.role;
+        } else if (req.params.workspaceId) {
+          // If no folderId/parentId, we are creating a root folder in the workspace.
+          // Get user's role from the workspace.
+          const workspaceMembers = await prisma.membership.findMany({
+            where: { workspaceId: req.params.workspaceId }
+          });
+          userRole = workspaceMembers.find((m) => m.userId === userId)?.role;
+        }
         break;
 
       case "file":
@@ -73,6 +82,7 @@ export const checkAccess = (resource: string, action: string) => {
     }
 
     if (!userRole) {
+      console.log(userRole)
       return res.status(403).json({ error: "Not a member of this resource" });
     }
 
