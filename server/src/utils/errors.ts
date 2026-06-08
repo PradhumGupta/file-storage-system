@@ -1,5 +1,3 @@
-import { PrismaClientInitializationError } from "@prisma/client/runtime/library";
-
 export class APIError extends Error {
   constructor(
     message: string,
@@ -30,3 +28,20 @@ export class NotFoundError extends APIError {
   }
 }
 
+export class BadRequestError extends APIError {
+  constructor(message: string) {
+    super(message, 400);
+  }
+}
+
+export class ConflictError extends APIError {
+  constructor(message: string) {
+    super(message, 409);
+  }
+}
+
+export class InternalServerError extends APIError {
+  constructor(message: string = "Internal Server Error") {
+    super(message, 500);
+  }
+}
