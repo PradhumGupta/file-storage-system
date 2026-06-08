@@ -68,7 +68,8 @@ const SignupPage = () => {
     try {
       const response = await AuthServices.verifyToken(credentialResponse.credential)
       login(response?.user);
-      toast.success("Account created successfully");
+      toast.success("Logged in successfully");
+      navigate("/dashboard")
     } catch (error: unknown) {
       if (error instanceof Error) toast.error("Google authentication failed: " + error.message);
     }
@@ -118,7 +119,7 @@ const SignupPage = () => {
 
             <button
               onClick={handleContinue}
-              className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md cursor-pointer"
+              className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md cursor-pointer flex justify-center"
             >
               {loading ? (
                 <Spinner className="size-6 text-blue-200" />

@@ -14,8 +14,6 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        console.log("in the interceptor")
-
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
@@ -31,7 +29,6 @@ api.interceptors.response.use(
                 return api(originalRequest);
             } catch (refreshError) {
                 // AuthServices.logout();
-                console.log("logging out due to error", refreshError)
                 return Promise.reject(refreshError)
             }
         }

@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -23,9 +23,9 @@ const Breadcrumbs = ({path}: PROPS) => {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/dashboard/${workspaceName}`} className="cursor-pointer">
+          <Link to={`/dashboard/${workspaceName}`} className="cursor-pointer">
             <Home className="h-4 w-4" />
-          </BreadcrumbLink>
+          </Link>
         </BreadcrumbItem>
         {path.map((item, index) => (
           <div key={item.id} className="flex items-center">

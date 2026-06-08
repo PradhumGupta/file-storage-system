@@ -20,7 +20,7 @@ export const UploadModal = ({
   const { activeWorkspace, activeFolder } = useWorkspace();
   
   if (!isOpen) return null;
-  if(!activeWorkspace || !activeFolder) {
+  if(!activeWorkspace) {
     return;
   }
 
@@ -41,7 +41,7 @@ export const UploadModal = ({
 
      uploadsArray.forEach(async (uploads, index) => {
         try {
-          await FileServices.upload(activeWorkspace.id, activeFolder.id, files[index], (percent) => {
+          await FileServices.upload(activeWorkspace.id, activeFolder?.id, files[index], (percent) => {
             setUploads(prev => {
               const copy = [...prev];
               copy[index] = { ...copy[index], progress: percent };

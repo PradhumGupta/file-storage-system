@@ -9,9 +9,9 @@ class FileServices {
         const response = await api.get(`/workspaces/${workspaceId}/folders/${folderId}/path`);
         return response.data.path
     }
-    public static upload = async (workspaceId: string, folderId: string, file: File, onProgress?: (percent: number) => void, signal?: AbortSignal) => {
+    public static upload = async (workspaceId: string, folderId: string|undefined, file: File, onProgress?: (percent: number) => void, signal?: AbortSignal) => {
         const formData = new FormData();
-        formData.append("folderId", folderId);
+        formData.append("folderId", folderId || "root");
         formData.append("file", file)
         
         const response = await api.post(`/workspaces/${workspaceId}/files/upload`, formData, {

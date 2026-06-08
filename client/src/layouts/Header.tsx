@@ -1,12 +1,12 @@
 
 function Header() {
   return (
-    <header className="flex justify-between items-center p-6 border-b border-gray-200">
-      <div className="flex items-center gap-2 text-blue-600 font-bold text-2xl">
+    <header className="flex justify-between items-center p-6 md:px-16 border-b border-gray-200">
+      <div className="flex items-center gap-2 font-bold text-2xl">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="40"
-          height="40"
+          width="36"
+          height="36"
           viewBox="0 0 600 450"
           role="img"
           aria-label="Zenith logo"
@@ -17,7 +17,7 @@ function Header() {
           />
           <circle cx="300" cy="80" r="35" fill="#000000" />
         </svg>
-        <h1>Zenith</h1>
+        <h1 className="text-2xl">Zenith</h1>
       </div>
     </header>
   );

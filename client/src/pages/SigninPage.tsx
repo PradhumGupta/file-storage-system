@@ -36,6 +36,7 @@ const SigninPage = () => {
       );
       login(response?.user);
       toast.success("logged in successfully");
+      navigate("/dashboard");
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message);
     } finally {
