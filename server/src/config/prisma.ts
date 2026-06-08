@@ -1,8 +1,12 @@
 // prismaClient
-
+import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from "@prisma/client";
+import pg from 'pg';
 
-const prisma = new PrismaClient();
+const pool = new pg.Pool({ connectionString: process.env.DB_URI });
+const adapter = new PrismaPg(pool);
+
+const prisma = new PrismaClient({ adapter });
 
 export async function main() {
   try {
