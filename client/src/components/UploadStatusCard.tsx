@@ -1,4 +1,3 @@
-import type { File } from "@/contexts/WorkspaceContext";
 import type { Upload } from "@/pages/Dashboard";
 import { Check, Clock, FileText, RotateCw, X } from "lucide-react";
 import { Progress } from "./ui/progress";
@@ -6,10 +5,9 @@ import { Progress } from "./ui/progress";
 interface props {
   uploads: Upload[];
   setUploads: React.Dispatch<React.SetStateAction<Upload[]>>;
-  setFiles: React.Dispatch<React.SetStateAction<File[]>>;
 }
 
-export function UploadStatusCard({ uploads, setUploads, setFiles }: props) {
+export function UploadStatusCard({ uploads, setUploads }: props) {
   const activeUploads = uploads.filter(
     (u) => u.status === "uploading" || u.status === "pending"
   );
@@ -26,7 +24,6 @@ export function UploadStatusCard({ uploads, setUploads, setFiles }: props) {
       case "uploading":
         return <RotateCw size={16} className="text-blue-500 animate-spin" />;
       case "completed":
-        setFiles((prev) => [...prev]);
         return <Check size={16} className="text-green-500" />;
       case "failed":
         return <X size={16} className="text-red-500" />;
@@ -84,12 +81,6 @@ export function UploadStatusCard({ uploads, setUploads, setFiles }: props) {
                 {file.name}
               </p>
               {file.status === "uploading" && (
-                // <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                //   <div
-                //     className="bg-blue-600 h-1.5 rounded-full"
-                //     style={{ width: `${upload.progress}%` }}
-                //   ></div>
-                // </div>
                 <Progress value={file.progress} className="w-[60%]" />
               )}
               <p className="text-xs text-gray-500">

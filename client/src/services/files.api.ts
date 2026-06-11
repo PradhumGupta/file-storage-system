@@ -23,7 +23,7 @@ class FileServices {
             },
             signal
         });
-        return response.data.status;
+        return response.data.file;
     }
     public static downloadFile = async (workspaceId: string, fileId: string) => {
         const response = await api.get(`/workspaces/${workspaceId}/files/${fileId}/download`, { responseType: 'blob' });

@@ -291,18 +291,17 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-      {/* Renders the Upload Modal */}
+
       <UploadModal
         setUploads={setUploads}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onUploadComplete={(file: File) => setFiles(prev => [...prev, file])}
       />
 
-      {/* Renders the Upload Status Card */}
       <UploadStatusCard
         uploads={uploads}
         setUploads={setUploads}
-        setFiles={setFiles}
       />
       {loading && (
         <div className="flex justify-center items-center gap-2 absolute inset-0">

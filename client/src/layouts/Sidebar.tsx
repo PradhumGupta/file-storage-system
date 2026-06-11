@@ -13,7 +13,6 @@ export default function Sidebar({ activeTab = 'All files' }: { activeTab?: strin
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-gray-50">
-      {/* Top of Sidebar */}
       <div className="mb-10 flex items-center gap-2 px-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"

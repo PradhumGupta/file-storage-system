@@ -9,12 +9,14 @@ interface props {
   setUploads: React.Dispatch<React.SetStateAction<Upload[]>>;
   isOpen: boolean;
   onClose: () => void;
+  onUploadComplete?: (file: any) => void;
 }
 
 export const UploadModal = ({
   setUploads,
   isOpen,
   onClose,
+  onUploadComplete,
 }: props) => {
 
   const { activeWorkspace, activeFolder } = useWorkspace();
@@ -25,10 +27,6 @@ export const UploadModal = ({
   }
 
   const handleFileUpload = async (files: FileList) => {
-    // Array.from(files).forEach((file) => {
-    //   startUpload(file);
-    // });
-
     const uploadsArray = Array.from(files).map(file => ({ 
       id: Date.now() + Math.random() + "",
       name: file.name, 
@@ -41,7 +39,7 @@ export const UploadModal = ({
 
      uploadsArray.forEach(async (uploads, index) => {
         try {
-          await FileServices.upload(activeWorkspace.id, activeFolder?.id, files[index], (percent) => {
+          const uploadedFile = await FileServices.upload(activeWorkspace.id, activeFolder?.id, files[index], (percent) => {
             setUploads(prev => {
               const copy = [...prev];
               copy[index] = { ...copy[index], progress: percent };
@@ -57,6 +55,9 @@ export const UploadModal = ({
           copy[index].status = "completed";
           return copy;
         });
+        if (onUploadComplete && uploadedFile) {
+          onUploadComplete(uploadedFile);
+        }
       } catch (error) {
         if (error instanceof Error) {
           if(error.name === "CanceledError") {

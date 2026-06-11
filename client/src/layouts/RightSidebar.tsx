@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { HardDrive, Users, Folder, FileIcon, Settings } from "lucide-react";
+import { HardDrive, Users, Folder, Settings } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import WorkspaceServices from "@/services/workspace.api";
 import toast from "react-hot-toast";
@@ -17,9 +17,6 @@ export default function RightSidebar() {
       if (activeWorkspace) {
         setLoadingMembers(true);
         try {
-          // In a real scenario, we might want to check if we are in a folder
-          // and fetch folder-specific members if the schema supports it.
-          // For now, we fetch workspace members.
           const fetchedMembers = await WorkspaceServices.getMembers(
             activeWorkspace.id,
             ""
@@ -41,14 +38,12 @@ export default function RightSidebar() {
   const isFolderView = !!activeFolder;
   const title = isFolderView ? activeFolder.name : activeWorkspace.name;
 
-  // Mock usage calculation for demo
   const usedStorage = isFolderView ? 15 : 45; // GB
   const totalStorage = isFolderView ? 100 : 100; // GB
   const percentage = (usedStorage / totalStorage) * 100;
 
   return (
     <aside className="w-80 h-full bg-gray-50 flex-shrink-0 p-6 border-l border-gray-200 flex flex-col hidden lg:flex overflow-y-auto">
-      {/* Header Info */}
       <div className="flex items-center gap-3 mb-8">
         <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
           {isFolderView ? <Folder size={24} /> : <HardDrive size={24} />}

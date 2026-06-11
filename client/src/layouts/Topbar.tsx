@@ -8,7 +8,6 @@ export default function Topbar() {
 
   return (
     <header className="flex items-center justify-between mb-8">
-      {/* Search Bar */}
       <div className="relative flex-1 mr-8 hidden md:block">
         <Search
           className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -23,7 +22,6 @@ export default function Topbar() {
       {/* Search Bar Mobile placeholder to keep flex structure */}
       <div className="md:hidden flex-1"></div>
 
-      {/* Right Icons */}
       <div className="flex items-center gap-4 text-gray-500">
         <WorkspaceSelector />
         <button className="flex items-center gap-2 p-1 rounded-full text-gray-700 font-medium hover:bg-gray-200 transition-colors duration-200">

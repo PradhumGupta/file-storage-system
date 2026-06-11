@@ -59,17 +59,14 @@ const SigninPage = () => {
 
   useEffect(() => {
     if (user) {
-      // const workspaceSlug = slugify(`${user.name} + 's Workspace`);
       navigate(`/dashboard/personal`);
     }
   }, [user]);
 
   return (
     <div className="min-h-screen bg-white font-sans">
-      {/* Header */}
       <Header />
 
-      {/* Main Content */}
       <main className="flex items-center justify-center p-4">
         <div className="relative w-full max-w-lg bg-white rounded-xl overflow-hidden">
           <div className="flex flex-col items-center p-8 w-full max-w-sm mx-auto">
@@ -85,7 +82,7 @@ const SigninPage = () => {
               <GoogleLogin
                 onSuccess={handleSuccess}
                 onError={() => console.log("Login Failed")}
-                useOneTap // This enables the smooth "One Tap" slide-down
+                useOneTap
                 theme="filled_blue"
                 shape="rectangular"
               />

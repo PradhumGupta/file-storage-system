@@ -21,7 +21,6 @@ const SignupPage = () => {
 
   const navigate = useNavigate();
 
-  // Handles input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prevData) => ({
@@ -237,10 +236,8 @@ const SignupPage = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans flex flex-col">
-      {/* Header */}
       <Header />
 
-      {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="relative w-full max-w-lg bg-white rounded-xl overflow-hidden">
           {step > 1 && (
