@@ -58,7 +58,7 @@ export class AuthController {
       password
     );
     setCookies(res, accessToken, refreshToken);
-    res.json({ message: "User logged in", accessToken, refreshToken, user });
+    res.json({ message: "User logged in", user });
   };
 
   public static refresh = async (req: Request, res: Response) => {
@@ -68,7 +68,7 @@ export class AuthController {
     const decoded: any = verifyRefreshToken(token);
     const accessToken = await authService.refresh(decoded.id, token);
     setCookies(res, accessToken, token);
-    res.status(201).json({ message: "Token refreshed", accessToken });
+    res.status(201).json({ message: "Token refreshed" });
   };
 
   public static logout = async (req: AuthRequest, res: Response) => {
@@ -93,6 +93,6 @@ export class AuthController {
     const { idToken } = googleAuthSchema.parse(req.body);
     const { accessToken, refreshToken, user } = await authService.verifyGoogleSubID(idToken);
     setCookies(res, accessToken, refreshToken);
-    res.json({ message: "User Profile retrieved", accessToken, refreshToken, user });
+    res.json({ message: "User Profile retrieved", user });
   };
 }

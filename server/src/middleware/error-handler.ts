@@ -15,9 +15,7 @@ export function errorHandler(
     return next();
   }
 
-  console.error("Error Caught by Handler:", err);
-
-  // If there's a database connection issue, attempt reconnect (legacy behavior)
+  // If there's a database connection issue, attempt reconnect
   if (err.message && err.message.includes('database server')) {
     main().catch(console.error);
   }
@@ -25,17 +23,17 @@ export function errorHandler(
   // Handle Zod Validation Errors
   if (err instanceof ZodError) {
     const formattedErrors = err.issues.map((e: any) => ({
+      errorType: "Validation Error",
       path: e.path.join("."),
       message: e.message,
     }));
     return res.status(400).json({
       success: false,
-      message: "Validation Error",
-      errors: formattedErrors,
+      message: formattedErrors[0].message,
+      error: formattedErrors[0]
     });
   }
 
-  // Handle Prisma Known Request Errors (e.g., Unique constraint failed)
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === "P2002") {
       return res.status(409).json({

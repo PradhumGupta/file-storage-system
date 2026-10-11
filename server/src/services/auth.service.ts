@@ -16,6 +16,7 @@ export class AuthService {
         const hashed = await bcrypt.hash(password, 10);
         const user = await prisma.user.create({
             data: { name, email, password: hashed },
+            omit: { password: true, subID: true, refreshToken: true }
         });
 
         // create personal workspace
@@ -37,17 +38,18 @@ export class AuthService {
         const accessToken = generateAccessToken(user.id)
         const refreshToken = generateRefreshToken(user.id);
 
-        await prisma.user.update({
+        const updatedUser = await prisma.user.update({
             where: { id: user.id },
-            data: { refreshToken }
+            data: { refreshToken },
+            omit: { password: true, subID: true, refreshToken: true }
         });
 
-        return { accessToken, refreshToken, user };
+        return { accessToken, refreshToken, user: updatedUser };
     }
 
     public refresh = async (userId: string, token: string) => {
         const user = await prisma.user.findUnique({ where: {id: userId} });
-        if(!user || user.refreshToken !== token) throw new Error("Invalid RT");
+        if(!user || user.refreshToken !== token) throw new Error("Invalid Refresh Token");
 
         const newAccessToken = generateAccessToken(user.id);
 
@@ -64,17 +66,19 @@ export class AuthService {
     public checkUser = async (email: string) => {
         const user = await prisma.user.findUnique({ where: {email} });
         
-        return user ? true : false
+        return !!user;
     }
 
     public getProfile = async (userId: string) => {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
+        const user = await prisma.user.findUnique({ where: { id: userId }, omit: { password: true, subID: true, refreshToken: true } });
         
         return user;
     }
 
     public getAllUsers = async () => {
-        const users = await prisma.user.findMany();
+        const users = await prisma.user.findMany({
+            omit: { password: true, subID: true, refreshToken: true }
+        });
 
         return users;
     }
@@ -103,11 +107,12 @@ export class AuthService {
         const accessToken = generateAccessToken(user.id);
         const refreshToken = generateRefreshToken(user.id);
 
-        await prisma.user.update({
+        const updatedUser = await prisma.user.update({
             where: { id: user.id },
-            data: { refreshToken }
+            data: { refreshToken },
+            omit: { password: true, subID: true, refreshToken: true }
         });
 
-        return { accessToken, refreshToken, user };
+        return { accessToken, refreshToken, user: updatedUser };
     }
 }
