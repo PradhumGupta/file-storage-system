@@ -7,6 +7,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { AuthServices } from "@/services/auth.api";
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from "@/hooks/useAuth";
+import { AxiosError } from "axios";
 
 const SignupPage = () => {
   const { login } = useAuth();
@@ -18,6 +19,7 @@ const SignupPage = () => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [isAgreed, setIsAgreed] = useState("");
 
   const navigate = useNavigate();
 
@@ -50,7 +52,7 @@ const SignupPage = () => {
 
       setStep((prevStep) => prevStep + 1);
     } catch (error) {
-      if (error instanceof Error) toast.error(error.message);
+      if (error instanceof AxiosError) toast.error(error?.response?.data?.message || error.message);
     } finally {
       setLoading(false);
     }
@@ -83,7 +85,7 @@ const SignupPage = () => {
               Sign up or log in
             </h2>
             <p className="text-gray-500 mb-8 text-center">
-              We recommend using your{" "}
+              We recommend using your
               <span className="font-semibold text-gray-700">work email</span>.
             </p>
 
@@ -135,7 +137,7 @@ const SignupPage = () => {
               Sign up or log in
             </h2>
             <p className="text-gray-500 mb-8 text-center">
-              We recommend using your{" "}
+              We recommend using your
               <span className="font-semibold text-gray-700">work email</span>.
             </p>
 
@@ -205,24 +207,21 @@ const SignupPage = () => {
               </div>
             </div>
 
-            <p className="text-xs text-gray-500 mb-6 text-center">
-              By selecting "Agree and sign up" I agree to the{" "}
-              <a href="#" className="text-blue-600 hover:underline">
+            <div className="flex gap-2 mb-4">
+              <input type="checkbox" id="agree" name="agree" value={isAgreed} onChange={() => setIsAgreed(isAgreed === "" ? "on" : "")} />
+              <label htmlFor="agree">I agree to the 
+                <a href="#" className="text-blue-600 hover:underline">
                 Zenith Terms
-              </a>{" "}
-              and{" "}
+              </a>
+              and
               <a href="#" className="text-blue-600 hover:underline">
                 Services Agreement
               </a>
-              . Learn about how we use and protect your data in our{" "}
-              <a href="#" className="text-blue-600 hover:underline">
-                Privacy Policy
-              </a>
-              .
-            </p>
+              </label>
+            </div>
 
             <button
-              onClick={handleContinue}
+              onClick={handleContinue} disabled={isAgreed === ""}
               className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md"
             >
               Agree and sign up
