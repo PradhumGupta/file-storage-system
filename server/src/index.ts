@@ -13,7 +13,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const corsOptions = {
-  origin: ['http://localhost:5173', process.env.CLIENT_URL!],
+  origin: process.env.ALLOWED_DOMAINS!.split(','),
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 };
